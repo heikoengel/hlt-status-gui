@@ -1,0 +1,126 @@
+<html>
+  <meta charset="utf-8">
+  <head>
+    <title>HLT Data Transport Framework Overview</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">-->
+
+    <!-- Latest compiled and minified JavaScript -->
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>-->
+
+    <style>
+
+*{
+  font-size: 12px;
+}
+
+path { 
+  stroke: steelblue;
+  stroke-width: 2;
+  fill: none;
+}
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.x.axis line {
+  stroke: lightgrey;
+}
+
+.x.axis .minor {
+  stroke-opacity: .5;
+}
+
+.x.axis path {
+  display: none;
+}
+
+
+.y.axis line {
+  stroke: lightgrey;
+}
+
+.y.axis .minor {
+  stroke-opacity: .5;
+}
+
+.y.axis path {
+  display: none;
+}
+
+/*.svg-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding-bottom: 50%; 
+  vertical-align: middle;
+  overflow: hidden;
+}
+.svg-content {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}*/
+
+.container {
+  width: auto;
+}
+    </style>
+  </head>
+  <body>
+  <div class="container">
+    <div class="row"><div class="messages"></div></div>
+    <div class="row">
+      <div id="runNumber"></div>
+      <div id="ctrlButton"><div onClick="toggleInterval()" class="btn btn-danger pull-right">Freeze</div></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <h3>Max. # of Events in Chain</h3>
+        <div id="maxPendingEvents"></div>
+      </div>
+      <div class="col-md-6">
+        <h3>Data Rates</h3>
+        <div id="hltDataRate"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <h3>Event Rates</h3>
+        <div id="hltEventRate"></div>
+      </div>
+      <div class="col-md-6">
+        <h3>Max # of Pending Output Events - Components</h3>
+        <div id="maxPendingOutputComponents"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <h3>Max # of Pending Input Events - Components</h3>
+        <div id="maxPendingInputComponents"></div>
+      </div>
+      <div class="col-md-6">
+        <h3>Min Free Output Buffer</h3>
+        <div id="minFreeOutputBuffer"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <h3>HLT Log Messages</h3>
+        <div id="hltLogMessages"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="file:///home/hengel/jsgui/graph.js" charset="utf-8"></script>
+  </body>
+  </html>
