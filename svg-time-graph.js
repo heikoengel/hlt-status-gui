@@ -5,8 +5,9 @@
 class svgTimeGraph {
     constructor(selector, width, height) {
 	this.margins = [20, 20, 20, 80];
-	this.legendspace = 20
+	this.legendspace = 20;
 	this.mintime_s = 600; // display min. 10 minutes
+	this.ticktime_min = 2; // grid tick every 2 minutes
 	this.width = width;
 	this.height = height;
 	this.color = d3.scale.category10();
@@ -31,7 +32,7 @@ class svgTimeGraph {
 	var x = d3.time.scale().domain(this.xrange).range([0, this.width]);
 	var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
 	var xAxis = d3.svg.axis().scale(x).tickSize(-this.height)
-	    .tickFormat(d3.time.format("%H:%M:%S")).ticks(d3.time.minutes, 1);
+	    .tickFormat(d3.time.format("%H:%M:%S")).ticks(d3.time.minutes, this.ticktime_min);
 	var yAxis = d3.svg.axis().scale(y).orient("left").tickSize(-this.width);
 
 	this.graph.select(".x.axis").call(xAxis);
@@ -67,7 +68,7 @@ class svgTimeGraph {
 		ymax = max;
 	    }
 	});
-	this.yrange[1] = ymax;
+	this.yrange[1] = 1.2*ymax;
 
 	var x = d3.time.scale().domain(this.xrange).range([0, this.width]);
 	var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);

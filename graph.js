@@ -10,17 +10,17 @@
  **/
 var jsonUrl = "http://cn58:8080";
 
-var graph_pendingEvents = new svgTimeGraph("#maxPendingEvents", 600, 300)
+var graph_pendingEvents = new svgTimeGraph("#maxPendingEvents", 400, 200)
 graph_pendingEvents.addYAxisLabel("Number of Events");
 graph_pendingEvents.addLine(0, "Max Pending Output Events");
 graph_pendingEvents.addLine(1, "Max Pending Input Events");
 
-var graph_hltDataRate = new svgTimeGraph("#hltDataRate", 600, 300);
+var graph_hltDataRate = new svgTimeGraph("#hltDataRate", 400, 200);
 graph_hltDataRate.addYAxisLabel("Data Rate [MB/s]");
 graph_hltDataRate.addLine(0, "HLT Input Data Rate");
 graph_hltDataRate.addLine(1, "HLT Output Data Rate");
 
-var graph_hltEventRate = new svgTimeGraph("#hltEventRate", 600, 300);
+var graph_hltEventRate = new svgTimeGraph("#hltEventRate", 400, 200);
 graph_hltEventRate.addYAxisLabel("Event Rate [MB/s]");
 graph_hltEventRate.addLine(0, "HLT Input Event Rate");
 graph_hltEventRate.addLine(1, "HLT Output Event Rate");
@@ -33,6 +33,8 @@ var tbl_logMessages = addTable("#logMessages", ['Timestamp', 'Facility', 'Messag
 var maxLogMessages = 25;
 var tbl_minFreeOutputBuffer = addTable("#minFreeOutputBuffer");
 
+var tbl_procStats = d3.select("#procStats");
+var tbl_frameworkStats = d3.select("#frameworkStats");
 
 function addText(selector, text) {
   var t = d3.select(selector).
@@ -90,30 +92,50 @@ function drawgraphs(){
 	}
 
 	text_runNumber.text("Run Number: "+getField(data, 'runNumber', "UNKNOWN"));
+	updateStats(tbl_procStats, getField(data, "proc_stats", []));
+	updateStats(tbl_frameworkStats, getField(data, "framework_stats", []));
 
 	// convert time string to date
-	var time = getField(data, 'time', []);
+	var time = getField(data, 'seq_time', []);
 	for (var i = 0; i < time.length; i++) {
 	    time[i] = new Date(time[i] * 1000);
 	}
 	if (time.length) {
 	    //max # of Events in Chain
-	    graph_pendingEvents.updateLine(0, time, data.maxPendingOutputEventCount);
-	    graph_pendingEvents.updateLine(1, time, data.maxPendingInputEventCount);
+	    graph_pendingEvents.updateLine(0, time, data.seq_maxPendingInputEventCount);
+	    graph_pendingEvents.updateLine(1, time, data.seq_maxPendingOutputEventCount);
 
 	    // Data Rates
-	    graph_hltDataRate.updateLine(0, time, data.hltInputDataRate);
-	    graph_hltDataRate.updateLine(1, time, data.hltOutputDataRate);
+	    graph_hltDataRate.updateLine(0, time, data.seq_hltInputDataRate);
+	    graph_hltDataRate.updateLine(1, time, data.seq_hltOutputDataRate);
 
 	    // Event Rates
-	    graph_hltEventRate.updateLine(0, time, data.hltInputEventRate);
-	    graph_hltEventRate.updateLine(1, time, data.hltOutputEventRate);
+	    graph_hltEventRate.updateLine(0, time, data.seq_hltInputEventRate);
+	    graph_hltEventRate.updateLine(1, time, data.seq_hltOutputEventRate);
 
-	    fillTable(tbl_maxPendingOutputComponents, data.maxPendingOutputComponents, "PendingOutputEventCount");
-	    fillTable(tbl_maxPendingInputComponents, data.maxPendingInputComponents, "PendingInputEventCount");
-	    fillTable(tbl_minFreeOutputBuffer, data.minFreeOutputBuffer, "minFreeOutputBuffer");
+	    //fillTable(tbl_maxPendingOutputComponents, data.maxPendingOutputComponents, "PendingOutputEventCount");
+	    //fillTable(tbl_maxPendingInputComponents, data.maxPendingInputComponents, "PendingInputEventCount");
+	    //fillTable(tbl_minFreeOutputBuffer, data.minFreeOutputBuffer, "minFreeOutputBuffer");
 	}
     });
+}
+
+function updateStats(instance, stats) {
+    instance.selectAll("*").remove();
+    for (var key in stats) {
+	var name = stats[key].name;
+	var val = stats[key].value;
+	var row = instance.append("tr");
+	if (typeof val == "object") {
+	    row.append("td").text(name);
+	    row.append("td").text(val.min).style("text-align", "center");
+	    row.append("td").text(val.avg).style("text-align", "center");
+	    row.append("td").text(val.max).style("text-align", "center");
+	} else {
+	    row.append("td").text(name);
+	    row.append("td").attr("colspan", "3").text(val).style("text-align", "center");
+	}
+    }
 }
 
 
