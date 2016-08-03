@@ -10,54 +10,28 @@
  **/
 var jsonUrl = "http://cn58:8080";
 
-// define dimensions of graph
-var m = [20, 20, 20, 80]; // margins
-var w = 600 - m[1] - m[3]; // width
-var h = 300 - m[0] - m[2]; // height 
+var graph_pendingEvents = new svgTimeGraph("#maxPendingEvents", 600, 300)
+graph_pendingEvents.addYAxisLabel("Number of Events");
+graph_pendingEvents.addLine(0, "Max Pending Output Events");
+graph_pendingEvents.addLine(1, "Max Pending Input Events");
 
-var x_range;
-var y_range;
+var graph_hltDataRate = new svgTimeGraph("#hltDataRate", 600, 300);
+graph_hltDataRate.addYAxisLabel("Data Rate [MB/s]");
+graph_hltDataRate.addLine(0, "HLT Input Data Rate");
+graph_hltDataRate.addLine(1, "HLT Output Data Rate");
 
-var graph_pendingEvents = createTimeSequenceSvq("#maxPendingEvents", 2, "Number of Events");
-var graph_hltDataRate = createTimeSequenceSvq("#hltDataRate", 2, "Data Rate [MB/s]");
-var graph_hltEventRate = createTimeSequenceSvq("#hltEventRate", 2, "Event Rate [Hz]");
+var graph_hltEventRate = new svgTimeGraph("#hltEventRate", 600, 300);
+graph_hltEventRate.addYAxisLabel("Event Rate [MB/s]");
+graph_hltEventRate.addLine(0, "HLT Input Event Rate");
+graph_hltEventRate.addLine(1, "HLT Output Event Rate");
+
 var text_runNumber = addText("#runNumber", "RunNumber UNKNOWN");
 var tbl_maxPendingOutputComponents = addTable("#maxPendingOutputComponents");
 var tbl_maxPendingInputComponents = addTable("#maxPendingInputComponents");
-var text_hltLogMessages = addText("#hltLogMessages", "");
+//var text_hltLogMessages = addText("#hltLogMessages", "");
+var tbl_logMessages = addTable("#logMessages", ['Timestamp', 'Facility', 'Message']);
+var maxLogMessages = 25;
 var tbl_minFreeOutputBuffer = addTable("#minFreeOutputBuffer");
-
-// auto-update every 2s
-var inter = setInterval(function() {
-  drawgraphs();
-}, 2000);
-
-function toggleInterval() {
-  var ctrlbtn = d3.select("#ctrlButton");
-  var state = 1;
-  var b = ctrlbtn.select(".btn-danger");
-  if (ctrlbtn.select(".btn-danger").empty()) {
-    b = ctrlbtn.select(".btn-success");
-    state = 0;
-  }
-
-  if (state == 0) {
-    console.log("Resuming...");
-    inter = setInterval( function() { drawgraphs(); }, 2000);
-    b.classed("btn-success", false);
-    b.classed("btn btn-danger pull-right", true);
-    b.text("Freeze");
-    b.on('click', toggleInterval);
-    drawgraphs();
-  } else {
-    console.log("Stopping...");
-    clearInterval(inter);
-    b.classed("btn btn-success pull-right", true);
-    b.classed("btn-danger", false);
-    b.text("Resume");
-    b.on('click', toggleInterval);
-  }
-}
 
 
 function addText(selector, text) {
@@ -67,7 +41,7 @@ function addText(selector, text) {
 }
 
 var titleDict = { "PendingInputEventCount" : "# of Pending Inputs",
-  "CurrentProcessedEventCount" : "Process Rate", 
+  "CurrentProcessedEventCount" : "Process Rate",
   "PendingOutputEventCount" : "# of Pending Outputs",
   "name" : "Component Name",
   "minFreeOutputBuffer" : "Free Output Buffer %" };
@@ -78,80 +52,72 @@ function addTable(selector) {
   return t;
 }
 
-function createTimeSequenceSvq(selector, nlines, yaxislabel){
-  // Add an SVG element with the desired dimensions and margin.
-  var svg_w = w + m[1] + m[3];
-  var svg_h = h + m[0] + m[2];
-  var g = d3.select(selector).append("svg:svg")
-    .attr("width", "100%").attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("viewBox", "0 0 "+svg_w+" "+svg_h)
-    .append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-
-  // Add the axis.
-  g.append("svg:g").attr("class", "x axis").attr("transform", "translate(0," + h + ")");
-  g.append("svg:g").attr("class", "y axis").attr("transform", "translate(0,0)");
-  g.append("text").attr("text-anchor", "middle")
-    .attr("transform", "translate("+ (-m[3]/2) +","+(h/2)+")rotate(-90)").text(yaxislabel);
-
-  var color = d3.scale.category10();
-  var legendspace = 20;
-  for (var i=0; i<nlines; i++) {
-    // line
-    g.append("svg:path").attr("class", "line").attr("id", "line"+i)
-      .style("stroke", color(i));
-    // label
-    g.append("text").attr("id", "label"+i).attr("x", 0).style("fill", color(i))
-      .attr("y", legendspace*i).text("");
-  }
-  return g;
-}
-
-function drawgraphs(){    
-  // get new data from jsonUrl
-  d3.json(jsonUrl, function(error, data){
-    printJsonErrors(".messages", error);
-
-    // convert time string to date
-    var time = data.time;
-    for (var i = 0; i < time.length; i++) {
-      //time[i] = parseDate.parse(time[i]);
-      time[i] = d3.time.format("%H:%M:%S").parse(time[i]);
+function addTable(selector, headers) {
+    var t = d3.select(selector).append("table")
+	.attr("class", "table table-condensed table-striped table-bordered");
+    th = t.select("thead");
+    if (th.empty()) {
+	th = t.append("thead").append("tr");
     }
-    //max # of Events in Chain
-    renderInto(graph_pendingEvents, 0, time, data.maxPendingOutputEventCount, d3.max(data.maxPendingOutputEventCount), "Max Pending Output Events");
-    renderInto(graph_pendingEvents, 1, time, data.maxPendingInputEventCount, d3.max(data.maxPendingOutputEventCount), "Max Pending Input Events");
-
-    // Data Rates
-    renderInto(graph_hltDataRate, 0, time, data.hltInputDataRate, d3.max(data.hltInputDataRate), "HLT Input Data Rate");
-    renderInto(graph_hltDataRate, 1, time, data.hltOutputDataRate, d3.max(data.hltInputDataRate), "HLT Output Data Rate");
-
-    // Event Rates
-    renderInto(graph_hltEventRate, 0, time, data.hltInputEventRate, d3.max(data.hltInputEventRate), "HLT Input Event Rate");
-    renderInto(graph_hltEventRate, 1, time, data.hltOutputEventRate, d3.max(data.hltOutputEventRate), "HLT Output Event Rate");
-
-    text_runNumber.text("Run Number: "+data.runNumber);
-    fillTable(tbl_maxPendingOutputComponents, data.maxPendingOutputComponents, "PendingOutputEventCount");
-    fillTable(tbl_maxPendingInputComponents, data.maxPendingInputComponents, "PendingInputEventCount");
-    fillTable(tbl_minFreeOutputBuffer, data.minFreeOutputBuffer, "minFreeOutputBuffer");
-    printHltLogMessages(text_hltLogMessages, data.hltmessages);
-  });
-}
-
-function printJsonErrors(selector, error) {
-  var errmsg = d3.select(selector).select(".alert");
-  if (error) {
-    if (errmsg.empty()) {
-      d3.select(".messages").append("div").attr("class", "alert alert-danger");
-      errmsg = d3.select(".messages").select(".alert");
+    for (var i in headers) {
+	th.append("th").text(headers[i]);
     }
-    errmsg.text("Error: Failed to read JSON data from "+jsonUrl+" - error: "+error);
-    console.warn(error);
-    return
-  }
-  if (!errmsg.empty()) {
-    errmsg.remove();
-  }
+    td = t.select("tbody");
+    if (td.empty()) {
+	td = t.append("tbody");
+    }
+    return td;
 }
+
+function getField(obj, key, default_value) {
+    if (!obj) {
+	return default_value;
+    }
+    if (obj.hasOwnProperty(key)) {
+	return obj[key];
+    } else {
+	return default_value;
+    }
+}
+
+function drawgraphs(){
+    // get new data from jsonUrl
+    d3.json(jsonUrl, function(error, data){
+	if (error) {
+	    var msg_obj = { 'facility':"hlt-status-gui", 'severity':"e",
+			    'msg':"Failed to retrieve JSON data from "+jsonUrl };
+	    addLogMessage(tbl_logMessages, msg_obj);
+	}
+
+	text_runNumber.text("Run Number: "+getField(data, 'runNumber', "UNKNOWN"));
+
+	// convert time string to date
+	var time = getField(data, 'time', []);
+	for (var i = 0; i < time.length; i++) {
+	    //time[i] = parseDate.parse(time[i]);
+	    time[i] = d3.time.format("%H:%M:%S").parse(time[i]);
+	}
+	if (time.length) {
+	    //max # of Events in Chain
+	    graph_pendingEvents.updateLine(0, time, data.maxPendingOutputEventCount);
+	    graph_pendingEvents.updateLine(1, time, data.maxPendingInputEventCount);
+
+	    // Data Rates
+	    graph_hltDataRate.updateLine(0, time, data.hltInputDataRate);
+	    graph_hltDataRate.updateLine(1, time, data.hltOutputDataRate);
+
+	    // Event Rates
+	    graph_hltEventRate.updateLine(0, time, data.hltInputEventRate);
+	    graph_hltEventRate.updateLine(1, time, data.hltOutputEventRate);
+
+	    fillTable(tbl_maxPendingOutputComponents, data.maxPendingOutputComponents, "PendingOutputEventCount");
+	    fillTable(tbl_maxPendingInputComponents, data.maxPendingInputComponents, "PendingInputEventCount");
+	    fillTable(tbl_minFreeOutputBuffer, data.minFreeOutputBuffer, "minFreeOutputBuffer");
+	}
+    });
+}
+
+
 
 // convert infologger severity to corresponding bootstrap class
 function severity2bootstrap(s) {
@@ -164,17 +130,21 @@ function severity2bootstrap(s) {
   }
 }
 
-function printHltLogMessages(textinst, messages) {
-  textinst.selectAll("*").remove();
-  if (messages.length <= 0) { return; }
-
-  messages.forEach( function(d) {
-    var msgclass = "alert "+severity2bootstrap(d['severity']);
-    var text = d['facility']+": "+d['msg'];
-    textinst.append("div").attr("class", msgclass).text(text);
-  });
+function addLogMessage(inst, msg) {
+    var msgclass = severity2bootstrap(msg['severity']);
+    var date = new Date();
+    // remove old entries
+    var msgs = inst.selectAll("tr");
+    var n_msgs = msgs[0].length;
+    if (n_msgs ==  maxLogMessages) {
+	msgs[0][n_msgs - 1].remove();
+    }
+    // add new entry
+    var line = inst.insert("tr", ":first-child");
+    line.append("td").classed(msgclass, true).text(date.toLocaleTimeString());
+    line.append("td").classed(msgclass, true).text(msg['facility']);
+    line.append("td").classed(msgclass, true).text(msg['msg']);
 }
-
 
 function fillTable(t, data, primarykey) {
   th = t.select("thead");
@@ -201,25 +171,6 @@ function fillTable(t, data, primarykey) {
       row.append("td").text(d[key]);
     }
   });
-}
-
-function renderInto(graph, lineno, xseq, yseq, ymax, label) {
-  if (ymax < 10) { ymax = 10; }
-  var xrange = [ d3.min(xseq), d3.max(xseq) ];
-  var yrange = [ 0, 1.2 * ymax ];
-  var x = d3.time.scale().domain(xrange).range([0, w]);
-  var y = d3.scale.linear().domain(yrange).range([h, 0]);
-  var drawline = d3.svg.line()
-    .x(function(i) { return x(xseq[i]); })
-    .y(function(i) { return y(yseq[i]); })
-    var xAxis = d3.svg.axis().scale(x).tickSize(-h)
-    .tickFormat(d3.time.format("%H:%M:%S")).ticks(d3.time.minutes, 1);
-  graph.select(".x.axis").call(xAxis);
-  var yAxis = d3.svg.axis().scale(y).orient("left").tickSize(-w);
-  graph.select(".y.axis").call(yAxis);
-  var nvals = Object.keys(xseq);
-  graph.select("#line"+lineno).attr("d", drawline(nvals));
-  graph.select("#label"+lineno).text(label);
 }
 
 drawgraphs();

@@ -1,6 +1,7 @@
+<!DOCTYPE html>
 <html>
-  <meta charset="utf-8">
   <head>
+    <meta charset="utf-8">
     <title>HLT Data Transport Framework Overview</title>
 
     <!-- Latest compiled and minified CSS -->
@@ -15,112 +16,130 @@
 
     <style>
 
-*{
-  font-size: 12px;
-}
+      *{
+      font-size: 12px;
+      }
 
-path { 
-  stroke: steelblue;
-  stroke-width: 2;
-  fill: none;
-}
+      path {
+      stroke: steelblue;
+      stroke-width: 2;
+      fill: none;
+      }
 
-.axis {
-  shape-rendering: crispEdges;
-}
+      .axis {
+      shape-rendering: crispEdges;
+      }
 
-.x.axis line {
-  stroke: lightgrey;
-}
+      .x.axis line {
+      stroke: lightgrey;
+      }
 
-.x.axis .minor {
-  stroke-opacity: .5;
-}
+      .x.axis .minor {
+      stroke-opacity: .5;
+      }
 
-.x.axis path {
-  display: none;
-}
+      .x.axis path {
+      display: none;
+      }
 
 
-.y.axis line {
-  stroke: lightgrey;
-}
+      .y.axis line {
+      stroke: lightgrey;
+      }
 
-.y.axis .minor {
-  stroke-opacity: .5;
-}
+      .y.axis .minor {
+      stroke-opacity: .5;
+      }
 
-.y.axis path {
-  display: none;
-}
+      .y.axis path {
+      display: none;
+      }
 
-/*.svg-container {
-  display: inline-block;
-  position: relative;
-  width: 100%;
-  padding-bottom: 50%; 
-  vertical-align: middle;
-  overflow: hidden;
-}
-.svg-content {
-  display: inline-block;
-  position: absolute;
-  top: 0;
-  left: 0;
-}*/
+      /*.svg-container {
+      display: inline-block;
+      position: relative;
+      width: 100%;
+      padding-bottom: 50%;
+      vertical-align: middle;
+      overflow: hidden;
+      }
+      .svg-content {
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      }*/
 
-.container {
-  width: auto;
-}
+      .container {
+      width: auto;
+      }
     </style>
   </head>
   <body>
-  <div class="container">
-    <div class="row"><div class="messages"></div></div>
-    <div class="row">
-      <div id="runNumber"></div>
-      <div id="ctrlButton"><div onClick="toggleInterval()" class="btn btn-danger pull-right">Freeze</div></div>
-    </div>
-    <div class="row">
-      <div class="col-md-6">
-        <h3>Max. # of Events in Chain</h3>
-        <div id="maxPendingEvents"></div>
-      </div>
-      <div class="col-md-6">
-        <h3>Data Rates</h3>
-        <div id="hltDataRate"></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-6">
-        <h3>Event Rates</h3>
-        <div id="hltEventRate"></div>
-      </div>
-      <div class="col-md-6">
-        <h3>Max # of Pending Output Events - Components</h3>
-        <div id="maxPendingOutputComponents"></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-6">
-        <h3>Max # of Pending Input Events - Components</h3>
-        <div id="maxPendingInputComponents"></div>
-      </div>
-      <div class="col-md-6">
-        <h3>Min Free Output Buffer</h3>
-        <div id="minFreeOutputBuffer"></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-6">
-        <h3>HLT Log Messages</h3>
-        <div id="hltLogMessages"></div>
+    <div class="container">
+
+      <ul class="nav nav-tabs">
+	<li id="tab_main" class="tab active">
+	  <a href="#" onClick="onClickTab('main')" >Overview</a>
+	</li>
+	<li id="tab_messages" class="tab">
+	  <a href="#" onClick="onClickTab('messages')">Messages</a>
+	</li>
+      </ul>
+
+      <div class="row"><div class="messages"></div></div>
+
+      <div class="row">
+	<div id="runNumber"></div>
+	<div id="ctrlButton"><div onClick="toggleInterval()" class="btn btn-danger pull-right">Freeze</div></div>
       </div>
 
-    </div>
-  </div>
+      <div class="tab_content" id="div_main">
+	<div class="row">
+	  <div class="col-md-6">
+            <h3>Max. # of Events in Chain</h3>
+            <div id="maxPendingEvents"></div>
+            <div id="test"></div>
+	  </div>
+	  <div class="col-md-6">
+            <h3>Data Rates</h3>
+            <div id="hltDataRate"></div>
+	  </div>
+	</div> <!-- row -->
+	<div class="row">
+	  <div class="col-md-6">
+            <h3>Event Rates</h3>
+            <div id="hltEventRate"></div>
+	  </div>
+	  <div class="col-md-6">
+            <h3>Max # of Pending Output Events - Components</h3>
+            <div id="maxPendingOutputComponents"></div>
+	  </div>
+	</div> <!-- row -->
+	<div class="row">
+	  <div class="col-md-6">
+            <h3>Max # of Pending Input Events - Components</h3>
+            <div id="maxPendingInputComponents"></div>
+	  </div>
+	  <div class="col-md-6">
+            <h3>Min Free Output Buffer</h3>
+            <div id="minFreeOutputBuffer"></div>
+	  </div>
+	</div> <!-- row -->
+      </div> <!-- div id_main -->
 
-  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-  <script src="file:///home/hengel/jsgui/graph.js" charset="utf-8"></script>
+      <div class="tab_content" id="div_messages" style="display:none;">
+	<div class="row">
+	  <div class="col-md-6">
+            <h3>HLT Log Messages</h3>
+            <div id="logMessages"></div>
+	  </div>
+	</div> <!-- row -->
+      </div> <!-- div_messages -->
+
+      <script src="d3.v3.min.js" charset="utf-8"></script>
+      <script src="svg-time-graph.js" charset="utf-8"></script>
+      <script src="graph.js" charset="utf-8"></script>
+      <script src="hlt-status-ui.js" charset="utf-8"></script>
   </body>
-  </html>
+</html>
