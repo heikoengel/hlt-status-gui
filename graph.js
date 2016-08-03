@@ -94,8 +94,7 @@ function drawgraphs(){
 	// convert time string to date
 	var time = getField(data, 'time', []);
 	for (var i = 0; i < time.length; i++) {
-	    //time[i] = parseDate.parse(time[i]);
-	    time[i] = d3.time.format("%H:%M:%S").parse(time[i]);
+	    time[i] = new Date(time[i] * 1000);
 	}
 	if (time.length) {
 	    //max # of Events in Chain

@@ -23,19 +23,19 @@ class svgTimeGraph {
 	this.graph.append("svg:g").attr("class", "x axis").attr("transform", "translate(0," + this.height + ")");
 	this.graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(0,0)");
 
-	this.x = d3.time.scale().domain(this.xrange).range([0, this.width]);
-	this.y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
-	this.xAxis = d3.svg.axis().scale(this.x).tickSize(-this.height)
-	    .tickFormat(d3.time.format("%H:%M:%S")).ticks(d3.time.minutes, 1);
-	this.yAxis = d3.svg.axis().scale(this.y).orient("left").tickSize(-this.width);
-
 	this.updateAxis();
 	this.lines = [];
     }
 
     updateAxis() {
-	this.graph.select(".x.axis").call(this.xAxis);
-	this.graph.select(".y.axis").call(this.yAxis);
+	var x = d3.time.scale().domain(this.xrange).range([0, this.width]);
+	var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
+	var xAxis = d3.svg.axis().scale(x).tickSize(-this.height)
+	    .tickFormat(d3.time.format("%H:%M:%S")).ticks(d3.time.minutes, 1);
+	var yAxis = d3.svg.axis().scale(y).orient("left").tickSize(-this.width);
+
+	this.graph.select(".x.axis").call(xAxis);
+	this.graph.select(".y.axis").call(yAxis);
     }
 
     addYAxisLabel(label) {
@@ -55,11 +55,11 @@ class svgTimeGraph {
     updateLine(index, xseq, yseq) {
 	if (!xseq.length || !yseq.length) { return; }
 	this.lines[index] = yseq;
-	var tmin = new Date(Date.now() - this.mintime_s*1000);
-	if (xseq[0] > this.xrange[0] && this.xrange[0] > tmin) {
-	    this.xrange[0] = xseq[0];
-	}
-	this.xrange[1] = Date.now();
+	var tseqmin = xseq[0];
+	var tseqmax = xseq[xseq.length-1];
+	var tmin = new Date(tseqmax.getTime() - this.mintime_s*1000);
+	this.xrange[0] = d3.min([tmin, tseqmin]);
+	this.xrange[1] = tseqmax;
 	var ymax = 10;
 	this.lines.forEach( function(line) {
 	    var max = d3.max(line);
@@ -68,13 +68,13 @@ class svgTimeGraph {
 	    }
 	});
 	this.yrange[1] = ymax;
-	this.updateAxis();
 
-	var x = this.x;
-	var y = this.y;
+	var x = d3.time.scale().domain(this.xrange).range([0, this.width]);
+	var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
 	var drawline = d3.svg.line()
 	    .x(function(d,i) { return x(xseq[i]); })
 	    .y(function(d,i) { return y(d); })
 	this.graph.select("#line"+index).attr("d", drawline(yseq));
+	this.updateAxis();
     }
 }
