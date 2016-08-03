@@ -8,7 +8,7 @@
  * 0.1  Aug. 2016       hengel          Initial Version
  *
  **/
-var jsonUrl = "http://cn58:8080";
+var jsonUrl = "http://localhost:8080";
 
 var graph_pendingEvents = new svgTimeGraph("#maxPendingEvents", 400, 200)
 graph_pendingEvents.addYAxisLabel("Number of Events");
@@ -25,14 +25,13 @@ graph_hltEventRate.addYAxisLabel("Event Rate [MB/s]");
 graph_hltEventRate.addLine(0, "HLT Input Event Rate");
 graph_hltEventRate.addLine(1, "HLT Output Event Rate");
 
-var text_runNumber = addText("#runNumber", "RunNumber UNKNOWN");
 var tbl_maxPendingOutputComponents = addTable("#maxPendingOutputComponents");
 var tbl_maxPendingInputComponents = addTable("#maxPendingInputComponents");
-//var text_hltLogMessages = addText("#hltLogMessages", "");
 var tbl_logMessages = addTable("#logMessages", ['Timestamp', 'Facility', 'Message']);
 var maxLogMessages = 25;
 var tbl_minFreeOutputBuffer = addTable("#minFreeOutputBuffer");
 
+var alert_messages = d3.select("#messages");
 var tbl_procStats = d3.select("#procStats");
 var tbl_frameworkStats = d3.select("#frameworkStats");
 
@@ -91,7 +90,11 @@ function drawgraphs(){
 	    addLogMessage(tbl_logMessages, msg_obj);
 	}
 
-	text_runNumber.text("Run Number: "+getField(data, 'runNumber', "UNKNOWN"));
+	var msgs = getField(data, 'messages', []);
+	updateStatusMessage(alert_messages, error, msgs);
+	msgs.forEach( function(m) {
+	    addLogMessage(tbl_logMessages, m);
+	});
 	updateStats(tbl_procStats, getField(data, "proc_stats", []));
 	updateStats(tbl_frameworkStats, getField(data, "framework_stats", []));
 
@@ -165,6 +168,19 @@ function addLogMessage(inst, msg) {
     line.append("td").classed(msgclass, true).text(date.toLocaleTimeString());
     line.append("td").classed(msgclass, true).text(msg['facility']);
     line.append("td").classed(msgclass, true).text(msg['msg']);
+}
+
+function updateStatusMessage(inst, error, msg) {
+    inst.selectAll("*").remove();
+    if (error) {
+	inst.append("div").classed("alert alert-danger", true)
+	    .text("Failed to retrieve JSON data from "+jsonUrl);
+    } else if (msg.length) {
+	msg.forEach( function(m) {
+	    inst.append("div").classed("alert "+severity2bootstrap(m['severity']), true)
+		.text(m['msg']);
+	});
+    }
 }
 
 function fillTable(t, data, primarykey) {

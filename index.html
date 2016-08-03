@@ -78,22 +78,44 @@
   <body>
     <div class="container">
 
-      <ul class="nav nav-tabs">
-	<li id="tab_main" class="tab active">
-	  <a href="#" onClick="onClickTab('main')" >Overview</a>
-	</li>
-	<li id="tab_messages" class="tab">
-	  <a href="#" onClick="onClickTab('messages')">Messages</a>
-	</li>
-      </ul>
+      <!-- Menu / Navigation -->
+      <nav class="navbar navbar-default">
+	<div class="navbar-header">
+	  <button type="button" class="navbar-toggle collapsed"
+		  data-toggle="collapse"
+		  data-target="#navbar-collapse-1"
+		  aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+	  </button>
+	  <img class="navbar-brand" src="HLTLogo.svg">
+	</div> <!-- navbar-header -->
+	<div class="collapse navbar-collapse" id="navbar-collapse-1">
+	  <ul class="nav navbar-nav">
+	    <li id="tab_main" class="tab active">
+	      <a href="#" onClick="onClickTab('main')" >Overview</a>
+	    </li>
+	    <li id="tab_messages" class="tab">
+	      <a href="#" onClick="onClickTab('messages')">Messages</a>
+	    </li>
+	  </ul>
+	  <form id="ctrlButton" class="navbar-form navbar-right">
+	    <button onClick="toggleInterval()" class="btn btn-danger
+						   pull-right">Freeze</button>
+	  </form>
+	</div> <!-- collapse navbar-collapse -->
+      </nav>
 
-      <div class="row"><div class="messages"></div></div>
-
-      <div class="row">
-	<div id="ctrlButton"><div onClick="toggleInterval()" class="btn btn-danger pull-right">Freeze</div></div>
-      </div>
-
+      <!-- Overview Tab -->
       <div class="tab_content" id="div_main">
+
+	<!-- Error Messages -->
+	<div class="row">
+	  <div class="col-md-12" id="messages"></div>
+	</div>
+
 	<div class="row">
 	  <div class="col-lg-4 col-md-6">
 	    <table class="table table-condensed table-striped table-bordered">
@@ -146,6 +168,7 @@
 	</div> <!-- row -->
       </div> <!-- div id_main -->
 
+      <!-- Messages Tab -->
       <div class="tab_content" id="div_messages" style="display:none;">
 	<div class="row">
 	  <div class="col-md-6">
