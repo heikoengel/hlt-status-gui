@@ -8,7 +8,18 @@
  * 0.1  Aug. 2016       hengel          Initial Version
  *
  **/
-var jsonUrl = "http://localhost:8080";
+
+var host = getParameterByName('host');
+if (!host) { host = "ecs0"; }
+if (!(host.match(/http:\/\//))) {
+    host = "http://"+host;
+}
+var port = getParameterByName('port');
+if (!port) { port = "8080"; }
+
+var jsonUrl = host + ":" + port;
+console.log(jsonUrl);
+
 
 var graph_pendingEvents = new svgTimeGraph("#maxPendingEvents", 400, 200)
 graph_pendingEvents.addYAxisLabel("Number of Events");
@@ -31,7 +42,7 @@ var tbl_logMessages = addTable("#logMessages", ['Timestamp', 'Facility', 'Messag
 var maxLogMessages = 25;
 var tbl_minFreeOutputBuffer = addTable("#minFreeOutputBuffer");
 
-var alert_messages = d3.select("#messages");
+var text_status = d3.select("#status");
 var tbl_procStats = d3.select("#procStats");
 var tbl_frameworkStats = d3.select("#frameworkStats");
 
@@ -84,17 +95,23 @@ function getField(obj, key, default_value) {
 function drawgraphs(){
     // get new data from jsonUrl
     d3.json(jsonUrl, function(error, data){
+	var status = "online";
 	if (error) {
 	    var msg_obj = { 'facility':"hlt-status-gui", 'severity':"e",
 			    'msg':"Failed to retrieve JSON data from "+jsonUrl };
 	    addLogMessage(tbl_logMessages, msg_obj);
+	    status = "offline";
 	}
 
 	var msgs = getField(data, 'messages', []);
-	updateStatusMessage(alert_messages, error, msgs);
+	if (msgs.length) {
+	    status = "warning";
+	}
 	msgs.forEach( function(m) {
 	    addLogMessage(tbl_logMessages, m);
 	});
+
+	updateStatus(text_status, status);
 	updateStats(tbl_procStats, getField(data, "proc_stats", []));
 	updateStats(tbl_frameworkStats, getField(data, "framework_stats", []));
 
@@ -142,7 +159,6 @@ function updateStats(instance, stats) {
 }
 
 
-
 // convert infologger severity to corresponding bootstrap class
 function severity2bootstrap(s) {
   switch (s) {
@@ -170,16 +186,20 @@ function addLogMessage(inst, msg) {
     line.append("td").classed(msgclass, true).text(msg['msg']);
 }
 
-function updateStatusMessage(inst, error, msg) {
-    inst.selectAll("*").remove();
-    if (error) {
-	inst.append("div").classed("alert alert-danger", true)
-	    .text("Failed to retrieve JSON data from "+jsonUrl);
-    } else if (msg.length) {
-	msg.forEach( function(m) {
-	    inst.append("div").classed("alert "+severity2bootstrap(m['severity']), true)
-		.text(m['msg']);
-	});
+function updateStatus(inst, status) {
+    switch (status) {
+    case "offline":
+	inst.attr("class", "alert alert-danger").text("Offline");
+	break;
+    case "warning":
+	inst.attr("class", "alert alert-warning").text("No connection to TaskManager");
+	break;
+    case "online":
+	inst.attr("class", "alert alert-success").text("Online");
+	break;
+    default:
+	inst.attr("class", "alert alert-info").text("UNKOWN");
+	break;
     }
 }
 
@@ -208,6 +228,21 @@ function fillTable(t, data, primarykey) {
       row.append("td").text(d[key]);
     }
   });
+}
+
+
+/**
+* parse URL GET parameters
+* jolly.exe, https://stackoverflow.com/questions/901115
+**/
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
 drawgraphs();
