@@ -50,6 +50,10 @@ path {
     min-width: 30%;
 }
 
+.center {
+    text-align: center;
+}
+
 @media (min-width: 768px) {
     .navbar .navbar-nav {
         display: inline-block;

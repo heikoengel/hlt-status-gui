@@ -6,8 +6,8 @@ class svgTimeGraph {
     constructor(selector, width, height) {
 	this.margins = [20, 20, 20, 80];
 	this.legendspace = 20;
-	this.mintime_s = 600; // display min. 10 minutes
-	this.ticktime_min = 2; // grid tick every 2 minutes
+	this.mintime_s = 300; // display min. 10 minutes
+	//this.ticktime_s = mintime_s / 5; // grid tick every 2 minutes
 	this.width = width;
 	this.height = height;
 	this.color = d3.scale.category10();
@@ -31,8 +31,13 @@ class svgTimeGraph {
     updateAxis() {
 	var x = d3.time.scale().domain(this.xrange).range([0, this.width]);
 	var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
+	var ticktime = +(this.mintime_s / 5); // always show ~5 ticks
+	var format = "%H:%M";
+	if (this.mintime_s < 300) {
+	    format += ":%S";
+	}
 	var xAxis = d3.svg.axis().scale(x).tickSize(-this.height)
-	    .tickFormat(d3.time.format("%H:%M:%S")).ticks(d3.time.minutes, this.ticktime_min);
+	    .tickFormat(d3.time.format(format)).ticks(d3.time.seconds, ticktime);
 	var yAxis = d3.svg.axis().scale(y).orient("left").tickSize(-this.width);
 
 	this.graph.select(".x.axis").call(xAxis);
@@ -55,12 +60,18 @@ class svgTimeGraph {
 
     updateLine(index, xseq, yseq) {
 	if (!xseq.length || !yseq.length) { return; }
-	this.lines[index] = yseq;
 	var tseqmin = xseq[0];
 	var tseqmax = xseq[xseq.length-1];
 	var tmin = new Date(tseqmax.getTime() - this.mintime_s*1000);
-	this.xrange[0] = d3.min([tmin, tseqmin]);
+	var tindex = 0;
+	for (tindex = 0; tindex < xseq.length; tindex++) {
+	    if (xseq[tindex] >= tmin) { break; }
+	}
+	this.xrange[0] = tmin;
 	this.xrange[1] = tseqmax;
+	xseq = xseq.slice(tindex, xseq.length);
+	yseq = yseq.slice(tindex, yseq.length);
+	this.lines[index] = yseq;
 	var ymax = 10;
 	this.lines.forEach( function(line) {
 	    var max = d3.max(line);

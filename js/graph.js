@@ -19,6 +19,8 @@ if (!port) { port = "8080"; }
 
 var jsonUrl = host + ":" + port;
 
+var default_graph_time_range = 600;
+
 var graph_pendingEvents = new svgTimeGraph("#maxPendingEvents", 400, 200)
 graph_pendingEvents.addYAxisLabel("Number of Events");
 graph_pendingEvents.addLine(0, "Max Pending Output Events");
@@ -50,6 +52,31 @@ var tbl_minFreeOutputBuffer = addTable("#minFreeOutputBuffer");
 var text_status = d3.select("#status");
 var tbl_procStats = d3.select("#procStats");
 var tbl_frameworkStats = d3.select("#frameworkStats");
+
+function updateMintime(time) {
+    graph_pendingEvents.mintime_s = time;
+    graph_hltDataRate.mintime_s = time;
+    graph_hltEventRate.mintime_s = time;
+    drawgraphs();
+}
+
+function zoomIn() {
+    mintime = graph_pendingEvents.mintime_s;
+    if (mintime <= 10) { mintime = 10; }
+    else { mintime = mintime / 2; }
+    updateMintime(mintime);
+}
+
+function zoomOut() {
+    mintime = graph_pendingEvents.mintime_s;
+    if (mintime >= default_graph_time_range) { mintime = default_graph_time_range; }
+    else { mintime = mintime * 2; }
+    updateMintime(mintime);
+}
+
+function zoomReset() {
+    updateMintime(default_graph_time_range);
+}
 
 function addText(selector, text) {
   var t = d3.select(selector).
