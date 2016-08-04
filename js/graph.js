@@ -55,6 +55,7 @@ function updateMintime(time) {
     graph_pendingEvents.mintime_s = time;
     graph_hltDataRate.mintime_s = time;
     graph_hltEventRate.mintime_s = time;
+    graph_avgEventSize.mintime_s = time;
     drawgraphs();
 }
 
