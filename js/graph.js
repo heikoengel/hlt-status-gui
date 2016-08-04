@@ -41,13 +41,11 @@ graph_avgEventSize.addYAxisLabel("Average Event Size [kB]");
 graph_avgEventSize.addLine(0, "HLT Input Average Event Size");
 graph_avgEventSize.addLine(1, "HLT Output Average Event Size");
 
-var tbl_maxPendingOutputComponents = addTable("#maxPendingOutputComponents");
 var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
 var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");
 var tbl_maxPendingInputsBridges = d3.select("#maxPendingInputsBridges");
 var tbl_logMessages = addTable("#logMessages", ['Timestamp', 'Facility', 'Message']);
 var maxLogMessages = 25;
-var tbl_minFreeOutputBuffer = addTable("#minFreeOutputBuffer");
 
 var text_status = d3.select("#status");
 var tbl_procStats = d3.select("#procStats");
@@ -83,12 +81,6 @@ function addText(selector, text) {
     append("div").text(text);
   return t;
 }
-
-var titleDict = { "PendingInputEventCount" : "# of Pending Inputs",
-  "CurrentProcessedEventCount" : "Process Rate",
-  "PendingOutputEventCount" : "# of Pending Outputs",
-  "name" : "Component Name",
-  "minFreeOutputBuffer" : "Free Output Buffer %" };
 
 function addTable(selector) {
   var t = d3.select(selector).append("table")
@@ -241,34 +233,6 @@ function updateStatus(inst, status) {
 	break;
     }
 }
-
-function fillTable(t, data, primarykey) {
-  th = t.select("thead");
-  if (th.empty() && data.length >= 1) {
-    th = t.append("thead").append("tr");
-    for (var key in data[0]) {
-      var title = key;
-      if (key in titleDict) {
-        title = titleDict[key];
-      }
-      th.append("td").text(title);
-    }
-  }
-  td = t.select("tbody");
-  if (td.empty()) {
-    td = t.append("tbody");
-  }
-  td.selectAll("*").remove();
-
-  data.forEach( function(d) {
-    var row = td.append("tr");
-    var vals = d;
-    for (var key in d) {
-      row.append("td").text(d[key]);
-    }
-  });
-}
-
 
 /**
 * parse URL GET parameters
