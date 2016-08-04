@@ -18,8 +18,6 @@ var port = getParameterByName('port');
 if (!port) { port = "8080"; }
 
 var jsonUrl = host + ":" + port;
-console.log(jsonUrl);
-
 
 var graph_pendingEvents = new svgTimeGraph("#maxPendingEvents", 400, 200)
 graph_pendingEvents.addYAxisLabel("Number of Events");

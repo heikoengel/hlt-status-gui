@@ -3,95 +3,8 @@
   <head>
     <meta charset="utf-8">
     <title>HLT Data Transport Framework Overview</title>
-
-    <!-- Latest compiled and minified CSS -->
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
-    <link rel="stylesheet" href="bootstrap.min.css">
-
-    <!-- Optional theme -->
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">-->
-
-    <!-- Latest compiled and minified JavaScript -->
-    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>-->
-    <style>
-
-      *{
-      font-size: 12px;
-      }
-
-      path {
-      stroke: steelblue;
-      stroke-width: 2;
-      fill: none;
-      }
-
-      .axis {
-      shape-rendering: crispEdges;
-      }
-
-      .x.axis line {
-      stroke: lightgrey;
-      }
-
-      .x.axis .minor {
-      stroke-opacity: .5;
-      }
-
-      .x.axis path {
-      display: none;
-      }
-
-      .y.axis line {
-      stroke: lightgrey;
-      }
-
-      .y.axis .minor {
-      stroke-opacity: .5;
-      }
-
-      .y.axis path {
-      display: none;
-      }
-
-      /*.svg-container {
-      display: inline-block;
-      position: relative;
-      width: 100%;
-      padding-bottom: 50%;
-      vertical-align: middle;
-      overflow: hidden;
-      }
-      .svg-content {
-      display: inline-block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      }*/
-
-      .container {
-      width: auto;
-      }
-
-      #status {
-      text-align: center;
-      margin-bottom: 0;
-      width:100%;
-      }
-
-      .status-indicator {
-      min-width: 30%;
-      }
-
-      .navbar .navbar-nav {
-      display: inline-block;
-      float: none;
-      vertical-align: top;
-      }
-
-      .navbar .navbar-collapse {
-      text-align: center;
-      }
-    </style>
+    <link rel="stylesheet" href="css/bootstrap-3.3.7.min.css">
+    <link rel="stylesheet" href="css/hlt-overrides.css">
   </head>
   <body>
 
@@ -126,10 +39,10 @@
 	  </ul>
 
 	  <!-- Freeze/Resume Button -->
-	  <form id="ctrlButton" class="navbar-form navbar-right">
-	    <button onClick="toggleInterval()" class="btn btn-danger
-						      pull-right">Freeze</button>
-	  </form>
+	  <ul id="ctrlButton" class="nav navbar-btn navbar-right">
+	    <li onClick="toggleInterval()" class="btn btn-danger
+						  pull-right">Freeze</li>
+	  </ul>
 	</div> <!-- collapse navbar-collapse -->
       </div>
     </nav>
@@ -200,9 +113,11 @@
 	</div> <!-- row -->
       </div> <!-- div_messages -->
 
-      <script src="d3.v3.min.js" charset="utf-8"></script>
-      <script src="svg-time-graph.js" charset="utf-8"></script>
-      <script src="graph.js" charset="utf-8"></script>
-      <script src="hlt-status-ui.js" charset="utf-8"></script>
+      <script src="js/d3.v3.min.js" charset="utf-8"></script>
+      <script src="js/svg-time-graph.js" charset="utf-8"></script>
+      <script src="js/graph.js" charset="utf-8"></script>
+      <script src="js/hlt-status-ui.js" charset="utf-8"></script>
+      <script src="js/jquery-1.12.4.min.js" charset="utf-8"></script>
+      <script src="js/bootstrap-3.3.7.min.js" charset="utf-8"></script>
   </body>
 </html>
