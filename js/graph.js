@@ -30,12 +30,19 @@ graph_hltDataRate.addLine(0, "HLT Input Data Rate");
 graph_hltDataRate.addLine(1, "HLT Output Data Rate");
 
 var graph_hltEventRate = new svgTimeGraph("#hltEventRate", 400, 200);
-graph_hltEventRate.addYAxisLabel("Event Rate [MB/s]");
+graph_hltEventRate.addYAxisLabel("Event Rate [Hz]");
 graph_hltEventRate.addLine(0, "HLT Input Event Rate");
 graph_hltEventRate.addLine(1, "HLT Output Event Rate");
 
+var graph_avgEventSize = new svgTimeGraph("#avgEventSize", 400, 200);
+graph_avgEventSize.addYAxisLabel("Average Event Size [kB]");
+graph_avgEventSize.addLine(0, "HLT Input Average Event Size");
+graph_avgEventSize.addLine(1, "HLT Output Average Event Size");
+
 var tbl_maxPendingOutputComponents = addTable("#maxPendingOutputComponents");
-var tbl_maxPendingInputComponents = addTable("#maxPendingInputComponents");
+var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
+var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");
+var tbl_maxPendingInputsBridges = d3.select("#maxPendingInputsBridges");
 var tbl_logMessages = addTable("#logMessages", ['Timestamp', 'Facility', 'Message']);
 var maxLogMessages = 25;
 var tbl_minFreeOutputBuffer = addTable("#minFreeOutputBuffer");
@@ -112,6 +119,9 @@ function drawgraphs(){
 	updateStatus(text_status, status);
 	updateStats(tbl_procStats, getField(data, "proc_stats", []));
 	updateStats(tbl_frameworkStats, getField(data, "framework_stats", []));
+	updateStats(tbl_maxPendingInputsComponents, getField(data, "list_maxPendingInputsComponents", []));
+	updateStats(tbl_maxPendingInputsMergers, getField(data, "list_maxPendingInputsMergers", []));
+	updateStats(tbl_maxPendingInputsBridges, getField(data, "list_maxPendingInputsBridges", []));
 
 	// convert time string to date
 	var time = getField(data, 'seq_time', []);
@@ -131,27 +141,31 @@ function drawgraphs(){
 	    graph_hltEventRate.updateLine(0, time, data.seq_hltInputEventRate);
 	    graph_hltEventRate.updateLine(1, time, data.seq_hltOutputEventRate);
 
-	    //fillTable(tbl_maxPendingOutputComponents, data.maxPendingOutputComponents, "PendingOutputEventCount");
-	    //fillTable(tbl_maxPendingInputComponents, data.maxPendingInputComponents, "PendingInputEventCount");
-	    //fillTable(tbl_minFreeOutputBuffer, data.minFreeOutputBuffer, "minFreeOutputBuffer");
+	    // Average Event Sizes
+	    graph_avgEventSize.updateLine(0, time, data.seq_hltInputAvgEventSize);
+	    graph_avgEventSize.updateLine(1, time, data.seq_hltOutputAvgEventSize);
 	}
     });
 }
 
 function updateStats(instance, stats) {
     instance.selectAll("*").remove();
-    for (var key in stats) {
-	var name = stats[key].name;
-	var val = stats[key].value;
+    for(var i=0; i<stats.length; i++) {
+	var name = stats[i].name;
+	var shortname = name;
+	if (name.length > 50) {
+	    shortname = name.slice(0,50)+"...";
+	}
+	var val = stats[i].value;
 	var row = instance.append("tr");
 	if (typeof val == "object") {
-	    row.append("td").text(name);
-	    row.append("td").text(val.min).style("text-align", "center");
-	    row.append("td").text(val.avg).style("text-align", "center");
-	    row.append("td").text(val.max).style("text-align", "center");
+	    row.append("td").attr("title", name).text(shortname);
+	    row.append("td").text(val.min);
+	    row.append("td").text(val.avg);
+	    row.append("td").text(val.max);
 	} else {
-	    row.append("td").text(name);
-	    row.append("td").attr("colspan", "3").text(val).style("text-align", "center");
+	    row.append("td").attr("title", name).text(shortname);
+	    row.append("td").attr("colspan", "3").text(val);
 	}
     }
 }
