@@ -42,7 +42,9 @@ graph_avgEventSize.addYAxisLabel("Average Event Size [kB]");
 graph_avgEventSize.addLine(0, "HLT Input Average Event Size");
 graph_avgEventSize.addLine(1, "HLT Output Average Event Size");
 
-var graph_bufferStats = new svgBarHistogram("#bufferStats", 800, 300);
+var graph_bufferStats = new svgBarGraph("#bufferStats", 800, 300);
+graph_bufferStats.addYAxisLabel("Number of Components");
+graph_bufferStats.addXAxisLabel("Percentage of Output Buffer Usage");
 
 var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
 var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");
@@ -173,15 +175,12 @@ function drawgraphs(){
 	}
         if (active_tab == "bufferstats") {
             var componentStats = getField(data, "component_stats", []);
+            var bufferUsage = getField(componentStats, "hist_bufferUsage", []);
             bufferstats = [];
             var index = 0;
-            for(var i = 0; i < componentStats.length; i++) {
-                //if (componentStats[i].type == "ControlledDataSource") {
-                    bufferstats[i] = componentStats[i].bufferUsage;
-                //    index++;
-               // }
+            for(var i = 0; i < bufferUsage.length; i++) {
+                bufferstats[i] = {'x': i, 'value':bufferUsage[i]};
             }
-            //console.log(bufferstats);
             graph_bufferStats.update(bufferstats);
         }
     });
