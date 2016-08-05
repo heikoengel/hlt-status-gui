@@ -13,6 +13,7 @@ var inter = setInterval(function() {
 /** handle clicks on navigation tabs **/
 function onClickTab(tab) {
     if (d3.select("#tab_"+tab).classed("active")) { return; }
+    active_tab = tab;
     // hide all tab_content
     d3.selectAll(".tab_content").style("display", "none");
     // show selected tab_content
@@ -20,6 +21,7 @@ function onClickTab(tab) {
     // mark tab as selected
     d3.selectAll(".tab").classed("active", false);
     d3.select("#tab_"+tab).classed("active", true);
+    drawgraphs();
 }
 
 

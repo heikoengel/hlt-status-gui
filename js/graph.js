@@ -18,6 +18,7 @@ var port = getParameterByName('port');
 if (!port) { port = "8080"; }
 
 var jsonUrl = host + ":" + port;
+var active_tab = "main";
 
 var default_graph_time_range = 600;
 
@@ -40,6 +41,8 @@ var graph_avgEventSize = new svgTimeGraph("#avgEventSize", 400, 200);
 graph_avgEventSize.addYAxisLabel("Average Event Size [kB]");
 graph_avgEventSize.addLine(0, "HLT Input Average Event Size");
 graph_avgEventSize.addLine(1, "HLT Output Average Event Size");
+
+var graph_bufferStats = new svgBarHistogram("#bufferStats", 800, 300);
 
 var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
 var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");
@@ -137,34 +140,50 @@ function drawgraphs(){
 	});
 
 	updateStatus(text_status, status);
-	updateStats(tbl_procStats, getField(data, "proc_stats", []));
-	updateStats(tbl_frameworkStats, getField(data, "framework_stats", []));
-	updateStats(tbl_maxPendingInputsComponents, getField(data, "list_maxPendingInputsComponents", []));
-	updateStats(tbl_maxPendingInputsMergers, getField(data, "list_maxPendingInputsMergers", []));
-	updateStats(tbl_maxPendingInputsBridges, getField(data, "list_maxPendingInputsBridges", []));
+	
+	if (active_tab == "main") {
+	    updateStats(tbl_procStats, getField(data, "proc_stats", []));
+	    updateStats(tbl_frameworkStats, getField(data, "framework_stats", []));
+	    updateStats(tbl_maxPendingInputsComponents, getField(data, "list_maxPendingInputsComponents", []));
+	    updateStats(tbl_maxPendingInputsMergers, getField(data, "list_maxPendingInputsMergers", []));
+	    updateStats(tbl_maxPendingInputsBridges, getField(data, "list_maxPendingInputsBridges", []));
 
-	// convert time string to date
-	var time = getField(data, 'seq_time', []);
-	for (var i = 0; i < time.length; i++) {
-	    time[i] = new Date(time[i] * 1000);
+	    // convert time string to date
+	    var time = getField(data, 'seq_time', []);
+	    for (var i = 0; i < time.length; i++) {
+		time[i] = new Date(time[i] * 1000);
+	    }
+	    if (time.length) {
+		//max # of Events in Chain
+		graph_pendingEvents.updateLine(0, time, data.seq_maxPendingInputEventCount);
+		graph_pendingEvents.updateLine(1, time, data.seq_maxPendingOutputEventCount);
+
+		// Data Rates
+		graph_hltDataRate.updateLine(0, time, data.seq_hltInputDataRate);
+		graph_hltDataRate.updateLine(1, time, data.seq_hltOutputDataRate);
+
+		// Event Rates
+		graph_hltEventRate.updateLine(0, time, data.seq_hltInputEventRate);
+		graph_hltEventRate.updateLine(1, time, data.seq_hltOutputEventRate);
+
+		// Average Event Sizes
+		graph_avgEventSize.updateLine(0, time, data.seq_hltInputAvgEventSize);
+		graph_avgEventSize.updateLine(1, time, data.seq_hltOutputAvgEventSize);
+	    }
 	}
-	if (time.length) {
-	    //max # of Events in Chain
-	    graph_pendingEvents.updateLine(0, time, data.seq_maxPendingInputEventCount);
-	    graph_pendingEvents.updateLine(1, time, data.seq_maxPendingOutputEventCount);
-
-	    // Data Rates
-	    graph_hltDataRate.updateLine(0, time, data.seq_hltInputDataRate);
-	    graph_hltDataRate.updateLine(1, time, data.seq_hltOutputDataRate);
-
-	    // Event Rates
-	    graph_hltEventRate.updateLine(0, time, data.seq_hltInputEventRate);
-	    graph_hltEventRate.updateLine(1, time, data.seq_hltOutputEventRate);
-
-	    // Average Event Sizes
-	    graph_avgEventSize.updateLine(0, time, data.seq_hltInputAvgEventSize);
-	    graph_avgEventSize.updateLine(1, time, data.seq_hltOutputAvgEventSize);
-	}
+        if (active_tab == "bufferstats") {
+            var componentStats = getField(data, "component_stats", []);
+            bufferstats = [];
+            var index = 0;
+            for(var i = 0; i < componentStats.length; i++) {
+                //if (componentStats[i].type == "ControlledDataSource") {
+                    bufferstats[i] = componentStats[i].bufferUsage;
+                //    index++;
+               // }
+            }
+            //console.log(bufferstats);
+            graph_bufferStats.update(bufferstats);
+        }
     });
 }
 

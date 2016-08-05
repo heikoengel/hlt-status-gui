@@ -8,6 +8,12 @@ path {
     fill: none;
 }
 
+rect {
+  fill: steelblue;
+  stroke-width: 1;
+  stroke: black;
+}
+
 .axis {
     shape-rendering: crispEdges;
 }
