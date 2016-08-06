@@ -5,7 +5,7 @@
 class svgTimeGraph {
     constructor(selector, width, height) {
 	this.margins = [20, 20, 20, 80];
-	this.legendspace = 20;
+	this.legendspace = 12;
 	this.mintime_s = 300; // display min. 10 minutes
 	//this.ticktime_s = mintime_s / 5; // grid tick every 2 minutes
 	this.width = width;
