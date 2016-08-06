@@ -46,6 +46,22 @@ var graph_bufferStats = new svgBarGraph("#bufferStats", 800, 300);
 graph_bufferStats.addYAxisLabel("Number of Components");
 graph_bufferStats.addXAxisLabel("Percentage of Output Buffer Usage");
 
+var graph_detectorEventRate = new svgTimeGraph("#detectorEventRate", 400, 200);
+graph_detectorEventRate.addYAxisLabel("Event Rate [Hz]");
+graph_detectorEventRate.addLine(0, "TPC Input Event Rate");
+graph_detectorEventRate.addLine(1, "SPD Input Event Rate");
+graph_detectorEventRate.addLine(2, "SSD Input Event Rate");
+graph_detectorEventRate.addLine(3, "SDD Input Event Rate");
+graph_detectorEventRate.addLine(4, "TRD Input Event Rate");
+
+var graph_detectorDataRate = new svgTimeGraph("#detectorDataRate", 400, 200);
+graph_detectorDataRate.addYAxisLabel("Data Rate [Hz]");
+graph_detectorDataRate.addLine(0, "TPC Input Data Rate");
+graph_detectorDataRate.addLine(1, "SPD Input Data Rate");
+graph_detectorDataRate.addLine(2, "SSD Input Data Rate");
+graph_detectorDataRate.addLine(3, "SDD Input Data Rate");
+graph_detectorDataRate.addLine(4, "TRD Input Data Rate");
+
 var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
 var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");
 var tbl_maxPendingInputsBridges = d3.select("#maxPendingInputsBridges");
@@ -142,6 +158,12 @@ function drawgraphs(){
 	});
 
 	updateStatus(text_status, status);
+
+	// convert time string to date
+	var time = getField(data, 'seq_time', []);
+	for (var i = 0; i < time.length; i++) {
+	    time[i] = new Date(time[i] * 1000);
+	}
 	
 	if (active_tab == "main") {
 	    updateStats(tbl_procStats, getField(data, "proc_stats", []));
@@ -150,11 +172,6 @@ function drawgraphs(){
 	    updateStats(tbl_maxPendingInputsMergers, getField(data, "list_maxPendingInputsMergers", []));
 	    updateStats(tbl_maxPendingInputsBridges, getField(data, "list_maxPendingInputsBridges", []));
 
-	    // convert time string to date
-	    var time = getField(data, 'seq_time', []);
-	    for (var i = 0; i < time.length; i++) {
-		time[i] = new Date(time[i] * 1000);
-	    }
 	    if (time.length) {
 		//max # of Events in Chain
 		graph_pendingEvents.updateLine(0, time, data.seq_maxPendingInputEventCount);
@@ -183,6 +200,21 @@ function drawgraphs(){
             }
             graph_bufferStats.update(bufferstats);
         }
+	if (active_tab == "detectorstats") {
+	    if (time.length) {
+		graph_detectorEventRate.updateLine(0, time, data.seq_tpcInputEventRate);
+		graph_detectorEventRate.updateLine(1, time, data.seq_spdInputEventRate);
+		graph_detectorEventRate.updateLine(2, time, data.seq_ssdInputEventRate);
+		graph_detectorEventRate.updateLine(3, time, data.seq_sddInputEventRate);
+		graph_detectorEventRate.updateLine(4, time, data.seq_trdInputEventRate);
+
+		graph_detectorDataRate.updateLine(0, time, data.seq_tpcInputDataRate);
+		graph_detectorDataRate.updateLine(1, time, data.seq_spdInputDataRate);
+		graph_detectorDataRate.updateLine(2, time, data.seq_ssdInputDataRate);
+		graph_detectorDataRate.updateLine(3, time, data.seq_sddInputDataRate);
+		graph_detectorDataRate.updateLine(4, time, data.seq_trdInputDataRate);
+	    }
+	}
     });
 }
 

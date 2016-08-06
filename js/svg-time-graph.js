@@ -84,6 +84,7 @@ class svgTimeGraph {
 	var x = d3.time.scale().domain(this.xrange).range([0, this.width]);
 	var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
 	var drawline = d3.svg.line()
+	    .defined(function(d) { return d>=0; })
 	    .x(function(d,i) { return x(xseq[i]); })
 	    .y(function(d,i) { return y(d); })
 	this.graph.select("#line"+index).attr("d", drawline(yseq));

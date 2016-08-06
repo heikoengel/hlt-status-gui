@@ -31,6 +31,9 @@
 	    <li id="tab_bufferstats" class="tab">
 	      <a href="#" onClick="onClickTab('bufferstats')">Buffer Status</a>
 	    </li>
+	    <li id="tab_detectorstats" class="tab">
+	      <a href="#" onClick="onClickTab('detectorstats')">Detector Status</a>
+	    </li>
 	    <li id="tab_messages" class="tab">
 	      <a href="#" onClick="onClickTab('messages')">Messages</a>
 	    </li>
@@ -159,6 +162,20 @@
           <div class="col-md-6">
 	    <h3>Output Buffer Fill States Overview</h3>
 	    <div id="bufferStats"></div>
+          </div>
+	</div>
+      </div>
+
+      <!-- Detector Stats Tab -->
+      <div class="tab_content" id="div_detectorstats" style="display:none;">
+	<div class="row">
+          <div class="col-md-6">
+	    <h3>Detector Event Rates</h3>
+	    <div id="detectorEventRate"></div>
+          </div>
+          <div class="col-md-6">
+	    <h3>Detector Data Rates</h3>
+	    <div id="detectorDataRate"></div>
           </div>
 	</div>
       </div>
