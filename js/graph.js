@@ -64,6 +64,7 @@ graph_detectorDataRate.addLine(1, "SPD Input Data Rate");
 graph_detectorDataRate.addLine(2, "SSD Input Data Rate");
 graph_detectorDataRate.addLine(3, "SDD Input Data Rate");
 graph_detectorDataRate.addLine(4, "EMCAL Input Data Rate");
+graph_detectorDataRate.setYAxisLogScale(1);
 
 var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
 var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");

@@ -26,11 +26,25 @@ class svgTimeGraph {
 
 	this.updateAxis();
 	this.lines = [];
+        this.yAxisLogScale = 0;
+    }
+
+    setYAxisLogScale(enable) {
+        if (enable) {
+            this.yAxisLogScale = 1;
+            this.yrange[0] = .1;
+        } else {
+            this.yAxisLogScale = 0;
+            this.yrange = 0;
+        }
     }
 
     updateAxis() {
 	var x = d3.scaleTime().domain(this.xrange).range([0, this.width]);
 	var y = d3.scaleLinear().domain(this.yrange).range([this.height, 0]);
+        if (this.yAxisLogScale) {
+	    y = d3.scaleLog().domain(this.yrange).range([this.height, 0]);
+        }
 	var ticktime = +(this.mintime_s / 5); // always show ~5 ticks
 	var format = "%H:%M";
 	if (this.mintime_s < 300) {
@@ -39,9 +53,16 @@ class svgTimeGraph {
 	var xAxis = d3.axisBottom().scale(x).tickSize(-this.height)
 	    .tickFormat(d3.timeFormat(format)).ticks(d3.timeSecond.every(ticktime));
 	var yAxis = d3.axisLeft().scale(y).tickSize(-this.width);
+	if (this.yAxisLogScale) {
+	    yAxis.tickFormat(d3.format("d"));
+	}
 
 	this.graph.select(".x.axis").call(xAxis);
 	this.graph.select(".y.axis").call(yAxis);
+	if (this.yAxisLogScale) {
+	    var showTicks = [1,10,100,1000,10000];
+	    var ticks = this.graph.selectAll(".y .tick text").filter(function(t) { return (showTicks.indexOf(t) > -1) ? null : this; }).remove();
+	}
     }
 
     addYAxisLabel(label) {
@@ -79,14 +100,18 @@ class svgTimeGraph {
 		ymax = max;
 	    }
 	});
-	this.yrange[1] = 1.2*ymax;
+	this.yrange[1] = (this.yAxisLogScale) ? 10*ymax : 1.2*ymax;
 
 	var x = d3.scaleTime().domain(this.xrange).range([0, this.width]);
 	var y = d3.scaleLinear().domain(this.yrange).range([this.height, 0]);
+        if (this.yAxisLogScale) {
+	    y = d3.scaleLog().domain(this.yrange).range([this.height, 0]);
+        }
+	var yrange = this.yrange;
 	var drawline = d3.line()
-	    .defined(function(d) { return d>=0; })
+	    .defined(function(d) { return d>-1; })
 	    .x(function(d,i) { return x(xseq[i]); })
-	    .y(function(d,i) { return y(d); })
+	    .y(function(d,i) { return (d < yrange[0]) ? y(yrange[0]) : y(d); })
 	this.graph.select("#line"+index).attr("d", drawline(yseq));
 	this.updateAxis();
     }
