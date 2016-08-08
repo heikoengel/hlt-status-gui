@@ -8,7 +8,7 @@ class svgBarGraph {
         this.margins = [20, 20, 60, 80];
         this.width = width;
         this.height = height;
-        this.color = d3.scale.category10();
+        this.color = d3.scaleOrdinal(d3.schemeCategory10);
         this.xrange = [0, 100];
         this.yrange = [0, 100];
         var svg_w = this.width + this.margins[1] + this.margins[3];
@@ -37,10 +37,10 @@ class svgBarGraph {
     }
 
     updateAxis() {
-        var x = d3.scale.linear().domain(this.xrange).range([0, this.width]);
-        var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
-        var xAxis = d3.svg.axis().scale(x).tickSize(-this.height).orient("bottom").ticks(10);
-        var yAxis = d3.svg.axis().scale(y).tickSize(-this.width).orient("left").ticks(10);
+        var x = d3.scaleLinear().domain(this.xrange).range([0, this.width]);
+        var y = d3.scaleLinear().domain(this.yrange).range([this.height, 0]);
+        var xAxis = d3.axisBottom().scale(x).tickSize(-this.height).ticks(10);
+        var yAxis = d3.axisLeft().scale(y).tickSize(-this.width).ticks(10);
         this.graph.select(".x.axis").call(xAxis);
         this.graph.select(".y.axis").call(yAxis);
     }
@@ -49,8 +49,8 @@ class svgBarGraph {
         if (!data) { return; }
         this.yrange = [0, 1.2*d3.sum(data, function(d) { return d.value; })];
         this.updateAxis();
-        var x = d3.scale.linear().domain(this.xrange).range([0, this.width]);
-        var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
+        var x = d3.scaleLinear().domain(this.xrange).range([0, this.width]);
+        var y = d3.scaleLinear().domain(this.yrange).range([this.height, 0]);
         var height = this.height;
         var width = this.width;
         var bars = this.graph.selectAll(".bar").data(data, function(d) { return d.x; });

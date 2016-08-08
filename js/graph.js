@@ -259,11 +259,7 @@ function addLogMessage(inst, msg) {
     var msgclass = severity2bootstrap(msg['severity']);
     var date = new Date();
     // remove old entries
-    var msgs = inst.selectAll("tr");
-    var n_msgs = msgs[0].length;
-    if (n_msgs ==  maxLogMessages) {
-	msgs[0][n_msgs - 1].remove();
-    }
+    inst.selectAll("tr").filter(function(d, i) { return (i >= (maxLogMessages-1)) ? this : null; }).remove();
     // add new entry
     var line = inst.insert("tr", ":first-child");
     line.append("td").classed(msgclass, true).text(date.toLocaleTimeString());

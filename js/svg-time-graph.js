@@ -10,7 +10,7 @@ class svgTimeGraph {
 	//this.ticktime_s = mintime_s / 5; // grid tick every 2 minutes
 	this.width = width;
 	this.height = height;
-	this.color = d3.scale.category10();
+	this.color = d3.scaleOrdinal(d3.schemeCategory10);
 	var xmin = Date.now() - this.mintime_s*1000;
 	this.xrange = [new Date(xmin), new Date()];
 	this.yrange = [0, 10];
@@ -29,16 +29,16 @@ class svgTimeGraph {
     }
 
     updateAxis() {
-	var x = d3.time.scale().domain(this.xrange).range([0, this.width]);
-	var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
+	var x = d3.scaleTime().domain(this.xrange).range([0, this.width]);
+	var y = d3.scaleLinear().domain(this.yrange).range([this.height, 0]);
 	var ticktime = +(this.mintime_s / 5); // always show ~5 ticks
 	var format = "%H:%M";
 	if (this.mintime_s < 300) {
 	    format += ":%S";
 	}
-	var xAxis = d3.svg.axis().scale(x).tickSize(-this.height)
-	    .tickFormat(d3.time.format(format)).ticks(d3.time.seconds, ticktime);
-	var yAxis = d3.svg.axis().scale(y).orient("left").tickSize(-this.width);
+	var xAxis = d3.axisBottom().scale(x).tickSize(-this.height)
+	    .tickFormat(d3.timeFormat(format)).ticks(d3.timeSecond.every(ticktime));
+	var yAxis = d3.axisLeft().scale(y).tickSize(-this.width);
 
 	this.graph.select(".x.axis").call(xAxis);
 	this.graph.select(".y.axis").call(yAxis);
@@ -81,9 +81,9 @@ class svgTimeGraph {
 	});
 	this.yrange[1] = 1.2*ymax;
 
-	var x = d3.time.scale().domain(this.xrange).range([0, this.width]);
-	var y = d3.scale.linear().domain(this.yrange).range([this.height, 0]);
-	var drawline = d3.svg.line()
+	var x = d3.scaleTime().domain(this.xrange).range([0, this.width]);
+	var y = d3.scaleLinear().domain(this.yrange).range([this.height, 0]);
+	var drawline = d3.line()
 	    .defined(function(d) { return d>=0; })
 	    .x(function(d,i) { return x(xseq[i]); })
 	    .y(function(d,i) { return y(d); })
