@@ -8,17 +8,20 @@
  * 0.1  Aug. 2016       hengel          Initial Version
  *
  **/
+var default_host = "ecs0";
+var default_port = "8080";
+var default_tab = "main";
 
 var host = getParameterByName('host');
-if (!host) { host = "ecs0"; }
+if (!host) { host = default_host; }
 if (!(host.match(/http:\/\//))) {
     host = "http://"+host;
 }
 var port = getParameterByName('port');
-if (!port) { port = "8080"; }
+if (!port) { port = default_port; }
 
 var jsonUrl = host + ":" + port;
-var active_tab = "main";
+var active_tab = default_tab;
 
 var default_graph_time_range = 600;
 
@@ -164,7 +167,7 @@ function drawgraphs(){
 	for (var i = 0; i < time.length; i++) {
 	    time[i] = new Date(time[i] * 1000);
 	}
-	
+
 	if (active_tab == "main") {
 	    updateStats(tbl_procStats, getField(data, "proc_stats", []));
 	    updateStats(tbl_frameworkStats, getField(data, "framework_stats", []));
