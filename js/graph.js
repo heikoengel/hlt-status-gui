@@ -27,8 +27,8 @@ var default_graph_time_range = 600;
 
 var graph_pendingEvents = new svgTimeGraph("#maxPendingEvents", 400, 200)
 graph_pendingEvents.addYAxisLabel("Number of Events");
-graph_pendingEvents.addLine(0, "Max Pending Output Events");
-graph_pendingEvents.addLine(1, "Max Pending Input Events");
+graph_pendingEvents.addLine(0, "Max Pending Input Events");
+graph_pendingEvents.addLine(1, "Max Pending Output Events");
 
 var graph_hltDataRate = new svgTimeGraph("#hltDataRate", 400, 200);
 graph_hltDataRate.addYAxisLabel("Data Rate [MB/s]");
