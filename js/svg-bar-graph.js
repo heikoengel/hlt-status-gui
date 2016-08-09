@@ -11,6 +11,7 @@ class svgBarGraph {
         this.color = d3.scaleOrdinal(d3.schemeCategory10);
         this.xrange = [0, 100];
         this.yrange = [0, 100];
+        this.yAxisLogScale = 0;
         var svg_w = this.width + this.margins[1] + this.margins[3];
         var svg_h = this.height + this.margins[0] + this.margins[2];
         this.graph = d3.select(selector).append("svg:svg")
@@ -22,6 +23,16 @@ class svgBarGraph {
         this.graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(0,0)");
 
         this.updateAxis();
+    }
+
+    setYAxisLogScale(enable) {
+        if (enable) {
+            this.yAxisLogScale = 1;
+            this.yrange[0] = .1;
+        } else {
+            this.yAxisLogScale = 0;
+            this.yrange = 0;
+        }
     }
 
     addYAxisLabel(label) {
@@ -39,32 +50,47 @@ class svgBarGraph {
     updateAxis() {
         var x = d3.scaleLinear().domain(this.xrange).range([0, this.width]);
         var y = d3.scaleLinear().domain(this.yrange).range([this.height, 0]);
+        if (this.yAxisLogScale) {
+	    y = d3.scaleLog().domain(this.yrange).range([this.height, 0]);
+         }
         var xAxis = d3.axisBottom().scale(x).tickSize(-this.height).ticks(10);
         var yAxis = d3.axisLeft().scale(y).tickSize(-this.width).ticks(10);
+	if (this.yAxisLogScale) {
+	    yAxis.tickFormat(d3.format("d"));
+	}
         this.graph.select(".x.axis").call(xAxis);
         this.graph.select(".y.axis").call(yAxis);
+	if (this.yAxisLogScale) {
+	    var showTicks = [1,10,100,1000,10000,100000,1000000];
+	    var ticks = this.graph.selectAll(".y .tick text").filter(function(t) { return (showTicks.indexOf(t) > -1) ? null : this; }).remove();
+	}
     }
 
     update(data) {
         if (!data) { return; }
-        this.yrange = [0, 1.2*d3.sum(data, function(d) { return d.value; })];
+        var sum = d3.sum(data, function(d) { return d.value; });
+        this.yrange[1] = (this.yAxisLogScale) ? 10*sum : 1.2*sum;
         this.updateAxis();
         var x = d3.scaleLinear().domain(this.xrange).range([0, this.width]);
         var y = d3.scaleLinear().domain(this.yrange).range([this.height, 0]);
+        if (this.yAxisLogScale) {
+	    y = d3.scaleLog().domain(this.yrange).range([this.height, 0]);
+         }
         var height = this.height;
         var width = this.width;
+        var yrange = this.yrange;
         var bars = this.graph.selectAll(".bar").data(data, function(d) { return d.x; });
         bars.exit().attr("y", function(d) { return y(d.value); })
             .attr("height", function(d) { ; return height - y(d.value); })
             .remove();
         bars.enter().append("rect")
             .attr("class", "bar")
-            .attr("y", function(d) { return y(d.value); })
-            .attr("height", function(d) { ; return height - y(d.value); });
+            .attr("y", function(d) { return (d.value > yrange[0]) ? y(d.value) : y(yrange[0]); })
+            .attr("height", function(d) { return (d.value > yrange[0]) ? (height - y(d.value)) : (height - y(yrange[0])); });
         bars.transition()
             .attr("x", function(d, i) { return x(d.x); })
             .attr("width", width/100)
-            .attr("y", function(d) { return y(d.value); })
-            .attr("height", function(d) { ; return height - y(d.value); });
+            .attr("y", function(d) { return (d.value > yrange[0]) ? y(d.value) : y(yrange[0]); })
+            .attr("height", function(d) { return (d.value > yrange[0]) ? (height - y(d.value)) : (height - y(yrange[0])); });
     }
 }

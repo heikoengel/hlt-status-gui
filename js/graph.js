@@ -48,6 +48,7 @@ graph_avgEventSize.addLine(1, "HLT Output Average Event Size");
 var graph_bufferStats = new svgBarGraph("#bufferStats", 800, 300);
 graph_bufferStats.addYAxisLabel("Number of Components");
 graph_bufferStats.addXAxisLabel("Percentage of Output Buffer Usage");
+graph_bufferStats.setYAxisLogScale(1);
 
 var graph_detectorEventRate = new svgTimeGraph("#detectorEventRate", 400, 200);
 graph_detectorEventRate.addYAxisLabel("Event Rate [Hz]");
