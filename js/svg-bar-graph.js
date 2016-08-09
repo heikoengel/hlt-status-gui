@@ -31,7 +31,7 @@ class svgBarGraph {
             this.yrange[0] = .1;
         } else {
             this.yAxisLogScale = 0;
-            this.yrange = 0;
+            this.yrange[0] = 0;
         }
     }
 
@@ -62,13 +62,14 @@ class svgBarGraph {
         this.graph.select(".y.axis").call(yAxis);
 	if (this.yAxisLogScale) {
 	    var showTicks = [1,10,100,1000,10000,100000,1000000];
-	    var ticks = this.graph.selectAll(".y .tick text").filter(function(t) { return (showTicks.indexOf(t) > -1) ? null : this; }).remove();
+	    this.graph.selectAll(".y .tick text").filter(function(t) { return (showTicks.indexOf(t) > -1) ? null : this; }).remove();
 	}
     }
 
     update(data) {
         if (!data) { return; }
         var sum = d3.sum(data, function(d) { return d.value; });
+        if (sum < 100) { sum = 100; }
         this.yrange[1] = (this.yAxisLogScale) ? 10*sum : 1.2*sum;
         this.updateAxis();
         var x = d3.scaleLinear().domain(this.xrange).range([0, this.width]);
