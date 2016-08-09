@@ -35,7 +35,7 @@ class svgTimeGraph {
             this.yrange[0] = .1;
         } else {
             this.yAxisLogScale = 0;
-            this.yrange = 0;
+            this.yrange[0] = 0;
         }
     }
 
