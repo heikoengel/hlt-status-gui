@@ -223,6 +223,10 @@ function drawgraphs(){
     });
 }
 
+function formatNumber(number) {
+    return (isNaN(number)) ? number : d3.format(",")(number);
+}
+
 function updateStats(instance, stats) {
     instance.selectAll("*").remove();
     for(var i=0; i<stats.length; i++) {
@@ -235,11 +239,14 @@ function updateStats(instance, stats) {
 	var row = instance.append("tr");
 	if (typeof val == "object") {
 	    row.append("td").attr("title", name).text(shortname);
-	    row.append("td").text(val.min);
-	    row.append("td").text(val.avg);
-	    row.append("td").text(val.max);
+	    row.append("td").text(formatNumber(val.min));
+	    row.append("td").text(formatNumber(val.avg));
+	    row.append("td").text(formatNumber(val.max));
 	} else {
 	    row.append("td").attr("title", name).text(shortname);
+            if (name != "Run Number") {
+                val = formatNumber(val);
+            }
 	    row.append("td").attr("colspan", "3").text(val);
 	}
     }
