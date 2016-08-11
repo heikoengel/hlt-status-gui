@@ -12,6 +12,7 @@ var default_host = "ecs0";
 var default_port = "8080";
 var default_tab = "main";
 var maxLogMessages = 25;
+var EXPECTED_API_VERSION = 1
 
 var host = getParameterByName('host');
 if (!host) { host = default_host; }
@@ -75,19 +76,19 @@ var hist_bufferUsageSrc = new svgBarGraph("#hist_bufferUsageSrc", 800, 300);
 hist_bufferUsageSrc.addYAxisLabel("Number of Source Components");
 hist_bufferUsageSrc.addXAxisLabel("Percentage of Output Buffer Usage");
 hist_bufferUsageSrc.setYAxisLogScale(1);
-var tbl_minFreeOutputBufferSrc = d3.select("#list_minFreeOutputBufferPrc");
+var tbl_minFreeOutputBufferSrc = d3.select("#tbl_minFreeOutputBufferSrc");
 
 var hist_bufferUsagePrc = new svgBarGraph("#hist_bufferUsagePrc", 800, 300);
 hist_bufferUsagePrc.addYAxisLabel("Number of Processing Components");
 hist_bufferUsagePrc.addXAxisLabel("Percentage of Output Buffer Usage");
 hist_bufferUsagePrc.setYAxisLogScale(1);
-var tbl_minFreeOutputBufferPrc = d3.select("#list_minFreeOutputBufferPrc");
+var tbl_minFreeOutputBufferPrc = d3.select("#tbl_minFreeOutputBufferPrc");
 
 var hist_bufferUsageOther = new svgBarGraph("#hist_bufferUsageOther", 800, 300);
 hist_bufferUsageOther.addYAxisLabel("Number of other Components");
 hist_bufferUsageOther.addXAxisLabel("Percentage of Output Buffer Usage");
 hist_bufferUsageOther.setYAxisLogScale(1);
-var tbl_minFreeOutputBufferOther = d3.select("#list_minFreeOutputBufferOther");
+var tbl_minFreeOutputBufferOther = d3.select("#tbl_minFreeOutputBufferOther");
 
 function updateMintime(time) {
     graph_pendingEvents.mintime_s = time;
@@ -167,7 +168,14 @@ function drawgraphs(){
 	}
 
 	var msgs = getField(data, 'messages', []);
-	if (msgs.length) {
+        var api_version = getField(data, "api_version", 0);
+        if (api_version != EXPECTED_API_VERSION) {
+            status = "api";
+            var msg = {'facility':"hlt_status-gui", 'severity':"w",
+                       'msg':"Expected data with API version "+EXPECTED_API_VERSION+
+                       ", but got data with version "+api_version+"."};
+            addLogMessage(tbl_logMessages, msg);
+        } else if (msgs.length) {
 	    status = "warning";
 	}
 	msgs.forEach( function(m) {
@@ -185,9 +193,9 @@ function drawgraphs(){
 	if (active_tab == "main") {
 	    updateStats(tbl_procStats, getField(data, "proc_stats", []));
 	    updateStats(tbl_frameworkStats, getField(data, "framework_stats", []));
-	    updateStats(tbl_maxPendingInputsComponents, getField(data, "list_maxPendingInputsComponents", []));
-	    updateStats(tbl_maxPendingInputsMergers, getField(data, "list_maxPendingInputsMergers", []));
-	    updateStats(tbl_maxPendingInputsBridges, getField(data, "list_maxPendingInputsBridges", []));
+	    updateStats(tbl_maxPendingInputsComponents, getField(data, "list_maxPendingInputsComponents", []), 3);
+	    updateStats(tbl_maxPendingInputsMergers, getField(data, "list_maxPendingInputsMergers", []), 3);
+	    updateStats(tbl_maxPendingInputsBridges, getField(data, "list_maxPendingInputsBridges", []), 3);
 
 	    if (time.length) {
 		//max # of Events in Chain
@@ -209,9 +217,11 @@ function drawgraphs(){
 	}
         if (active_tab == "bufferstats") {
             hist_bufferUsageSrc.update(prepareList(data, "hist_bufferUsageSrc"));
-            updateStats(tbl_minFreeOutputBufferSrc, "list_minFreeOutputBufferSrc");
+            updateStats(tbl_minFreeOutputBufferSrc, getField(data, "list_minFreeOutputBufferSrc", []));
             hist_bufferUsagePrc.update(prepareList(data, "hist_bufferUsagePrc"));
+            updateStats(tbl_minFreeOutputBufferPrc, getField(data, "list_minFreeOutputBufferPrc", []));
             hist_bufferUsageOther.update(prepareList(data, "hist_bufferUsageOther"));
+            updateStats(tbl_minFreeOutputBufferOther, getField(data, "list_minFreeOutputBufferOther", []));
         }
 
 	if (active_tab == "detectorstats") {
@@ -300,6 +310,9 @@ function updateStatus(inst, status) {
     switch (status) {
     case "offline":
 	inst.attr("class", "alert alert-danger").text("Offline");
+	break;
+    case "api":
+	inst.attr("class", "alert alert-warning").text("Unexpected API version");
 	break;
     case "warning":
 	inst.attr("class", "alert alert-warning").text("No connection to TaskManager");
