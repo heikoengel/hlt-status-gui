@@ -54,6 +54,9 @@ graph_detectorEventRate.addLine(1, "SPD Input Event Rate");
 graph_detectorEventRate.addLine(2, "SSD Input Event Rate");
 graph_detectorEventRate.addLine(3, "SDD Input Event Rate");
 graph_detectorEventRate.addLine(4, "EMCAL Input Event Rate");
+graph_detectorEventRate.addLine(5, "TRD Input Event Rate");
+graph_detectorEventRate.addLine(6, "V0 Input Event Rate");
+graph_detectorEventRate.addLine(7, "ZDC Input Event Rate");
 
 var graph_detectorDataRate = new svgTimeGraph("#detectorDataRate", 400, 200);
 graph_detectorDataRate.addYAxisLabel("Data Rate [MB/s]");
@@ -62,6 +65,9 @@ graph_detectorDataRate.addLine(1, "SPD Input Data Rate");
 graph_detectorDataRate.addLine(2, "SSD Input Data Rate");
 graph_detectorDataRate.addLine(3, "SDD Input Data Rate");
 graph_detectorDataRate.addLine(4, "EMCAL Input Data Rate");
+graph_detectorDataRate.addLine(5, "TRD Input Data Rate");
+graph_detectorDataRate.addLine(6, "V0 Input Data Rate");
+graph_detectorDataRate.addLine(7, "ZDC Input Data Rate");
 graph_detectorDataRate.setYAxisLogScale(1);
 
 var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
@@ -167,16 +173,18 @@ function drawgraphs(){
 	    status = "offline";
 	}
 
-	var msgs = getField(data, 'messages', []);
         var api_version = getField(data, "api_version", 0);
         if (api_version != EXPECTED_API_VERSION) {
-            status = "api";
+            status = (status == "online") ? "api" : status;
             var msg = {'facility':"hlt_status-gui", 'severity':"w",
                        'msg':"Expected data with API version "+EXPECTED_API_VERSION+
                        ", but got data with version "+api_version+"."};
             addLogMessage(tbl_logMessages, msg);
-        } else if (msgs.length) {
-	    status = "warning";
+        }
+
+	var msgs = getField(data, 'messages', []);
+        if (msgs.length) {
+            status = (status == "online") ? "warning" : status;
 	}
 	msgs.forEach( function(m) {
 	    addLogMessage(tbl_logMessages, m);
@@ -231,12 +239,18 @@ function drawgraphs(){
 		graph_detectorEventRate.updateLine(2, time, data.seq_itsssdInputEventRate);
 		graph_detectorEventRate.updateLine(3, time, data.seq_itssddInputEventRate);
 		graph_detectorEventRate.updateLine(4, time, data.seq_emcalInputEventRate);
+		graph_detectorEventRate.updateLine(5, time, data.seq_trdInputEventRate);
+		graph_detectorEventRate.updateLine(6, time, data.seq_v0InputEventRate);
+		graph_detectorEventRate.updateLine(7, time, data.seq_zdcInputEventRate);
 
 		graph_detectorDataRate.updateLine(0, time, data.seq_tpcInputDataRate);
 		graph_detectorDataRate.updateLine(1, time, data.seq_itsspdInputDataRate);
 		graph_detectorDataRate.updateLine(2, time, data.seq_itsssdInputDataRate);
 		graph_detectorDataRate.updateLine(3, time, data.seq_itssddInputDataRate);
 		graph_detectorDataRate.updateLine(4, time, data.seq_emcalInputDataRate);
+		graph_detectorDataRate.updateLine(5, time, data.seq_trdInputDataRate);
+		graph_detectorDataRate.updateLine(6, time, data.seq_v0InputDataRate);
+		graph_detectorDataRate.updateLine(7, time, data.seq_zdcInputDataRate);
 	    }
 	}
     });

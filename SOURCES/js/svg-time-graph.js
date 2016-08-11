@@ -113,6 +113,14 @@ class svgTimeGraph {
 	    .x(function(d,i) { return x(xseq[i]); })
 	    .y(function(d,i) { return (d < yrange[0]) ? y(yrange[0]) : y(d); })
 	this.graph.select("#line"+index).attr("d", drawline(yseq));
+
+        // show/hide label
+        if (d3.max(yseq) <= 0) {
+            this.graph.select("#label"+index).attr("visibility", "hidden");
+        } else {
+            this.graph.select("#label"+index).attr("visibility", "unset");
+        }
+
 	this.updateAxis();
     }
 }
