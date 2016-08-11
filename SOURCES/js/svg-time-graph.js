@@ -4,8 +4,9 @@
  **/
 class svgTimeGraph {
     constructor(selector, width, height) {
-	this.margins = [20, 20, 20, 80];
-	this.legendspace = 12;
+	this.margins = [50, 20, 20, 80];
+        this.legendspace_x = width/3;
+	this.legendspace_y = this.margins[0]/4;
 	this.mintime_s = 300; // display min. 10 minutes
 	//this.ticktime_s = mintime_s / 5; // grid tick every 2 minutes
 	this.width = width;
@@ -72,15 +73,18 @@ class svgTimeGraph {
     }
 
     addLine(index, label) {
+        var yindex = (index % 4)+1;
+        var xindex = index >> 2;
 	this.graph.append("svg:path").attr("class", "line").attr("id", "line"+index)
 	    .style("stroke", this.color(index));
-	this.graph.append("text").attr("id", "label"+index).attr("x", 0).style("fill", this.color(index))
-	    .attr("y", this.legendspace*index).text(label);
+	this.graph.append("text").attr("id", "label"+index).attr("visibility", "hidden")
+            .attr("x", this.legendspace_x*xindex).style("fill", this.color(index))
+	    .attr("y", -this.margins[0] + this.legendspace_y*yindex).text(label);
 	this.lines.push({index:[]});
     }
 
     updateLine(index, xseq, yseq) {
-	if (!xseq.length || !yseq.length) { return; }
+	if (!xseq || !yseq || !xseq.length || !yseq.length) { return; }
 	var tseqmin = xseq[0];
 	var tseqmax = xseq[xseq.length-1];
 	var tmin = new Date(tseqmax.getTime() - this.mintime_s*1000);
