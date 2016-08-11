@@ -11,6 +11,7 @@
 var default_host = "ecs0";
 var default_port = "8080";
 var default_tab = "main";
+var maxLogMessages = 25;
 
 var host = getParameterByName('host');
 if (!host) { host = default_host; }
@@ -45,11 +46,6 @@ graph_avgEventSize.addYAxisLabel("Average Event Size [kB]");
 graph_avgEventSize.addLine(0, "HLT Input Average Event Size");
 graph_avgEventSize.addLine(1, "HLT Output Average Event Size");
 
-var graph_bufferStats = new svgBarGraph("#bufferStats", 800, 300);
-graph_bufferStats.addYAxisLabel("Number of Components");
-graph_bufferStats.addXAxisLabel("Percentage of Output Buffer Usage");
-graph_bufferStats.setYAxisLogScale(1);
-
 var graph_detectorEventRate = new svgTimeGraph("#detectorEventRate", 400, 200);
 graph_detectorEventRate.addYAxisLabel("Event Rate [Hz]");
 graph_detectorEventRate.addLine(0, "TPC Input Event Rate");
@@ -71,11 +67,27 @@ var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
 var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");
 var tbl_maxPendingInputsBridges = d3.select("#maxPendingInputsBridges");
 var tbl_logMessages = addTable("#logMessages", ['Timestamp', 'Facility', 'Message']);
-var maxLogMessages = 25;
-
 var text_status = d3.select("#status");
 var tbl_procStats = d3.select("#procStats");
 var tbl_frameworkStats = d3.select("#frameworkStats");
+
+var hist_bufferUsageSrc = new svgBarGraph("#hist_bufferUsageSrc", 800, 300);
+hist_bufferUsageSrc.addYAxisLabel("Number of Source Components");
+hist_bufferUsageSrc.addXAxisLabel("Percentage of Output Buffer Usage");
+hist_bufferUsageSrc.setYAxisLogScale(1);
+var tbl_minFreeOutputBufferSrc = d3.select("#list_minFreeOutputBufferPrc");
+
+var hist_bufferUsagePrc = new svgBarGraph("#hist_bufferUsagePrc", 800, 300);
+hist_bufferUsagePrc.addYAxisLabel("Number of Processing Components");
+hist_bufferUsagePrc.addXAxisLabel("Percentage of Output Buffer Usage");
+hist_bufferUsagePrc.setYAxisLogScale(1);
+var tbl_minFreeOutputBufferPrc = d3.select("#list_minFreeOutputBufferPrc");
+
+var hist_bufferUsageOther = new svgBarGraph("#hist_bufferUsageOther", 800, 300);
+hist_bufferUsageOther.addYAxisLabel("Number of other Components");
+hist_bufferUsageOther.addXAxisLabel("Percentage of Output Buffer Usage");
+hist_bufferUsageOther.setYAxisLogScale(1);
+var tbl_minFreeOutputBufferOther = d3.select("#list_minFreeOutputBufferOther");
 
 function updateMintime(time) {
     graph_pendingEvents.mintime_s = time;
@@ -196,15 +208,12 @@ function drawgraphs(){
 	    }
 	}
         if (active_tab == "bufferstats") {
-            var componentStats = getField(data, "component_stats", []);
-            var bufferUsage = getField(componentStats, "hist_bufferUsage", []);
-            bufferstats = [];
-            var index = 0;
-            for(var i = 0; i < bufferUsage.length; i++) {
-                bufferstats[i] = {'x': i, 'value':bufferUsage[i]};
-            }
-            graph_bufferStats.update(bufferstats);
+            hist_bufferUsageSrc.update(prepareList(data, "hist_bufferUsageSrc"));
+            updateStats(tbl_minFreeOutputBufferSrc, "list_minFreeOutputBufferSrc");
+            hist_bufferUsagePrc.update(prepareList(data, "hist_bufferUsagePrc"));
+            hist_bufferUsageOther.update(prepareList(data, "hist_bufferUsageOther"));
         }
+
 	if (active_tab == "detectorstats") {
 	    if (time.length) {
 		graph_detectorEventRate.updateLine(0, time, data.seq_tpcInputEventRate);
@@ -223,13 +232,25 @@ function drawgraphs(){
     });
 }
 
+function prepareList(data, key) {
+    var list = getField(data, key, []);
+    var outlist = [];
+    for (var i = 0; i < list.length; i++) {
+        outlist[i] = {'x':i, 'value':list[i]};
+    }
+    return outlist;
+}
+
 function formatNumber(number) {
     return (isNaN(number)) ? number : d3.format(",")(number);
 }
 
-function updateStats(instance, stats) {
+function updateStats(instance, stats, limit=0) {
     instance.selectAll("*").remove();
-    for(var i=0; i<stats.length; i++) {
+    if (!limit) {
+        limit = stats.length;
+    }
+    for(var i=0; i<limit; i++) {
 	var name = stats[i].name;
 	var shortname = name;
 	if (name.length > 50) {
@@ -251,7 +272,6 @@ function updateStats(instance, stats) {
 	}
     }
 }
-
 
 // convert infologger severity to corresponding bootstrap class
 function severity2bootstrap(s) {
