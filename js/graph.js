@@ -257,9 +257,7 @@ function formatNumber(number) {
 
 function updateStats(instance, stats, limit=0) {
     instance.selectAll("*").remove();
-    if (!limit) {
-        limit = stats.length;
-    }
+    limit = (limit) ? d3.min([limit, stats.length]) : stats.length;
     for(var i=0; i<limit; i++) {
 	var name = stats[i].name;
 	var shortname = name;
