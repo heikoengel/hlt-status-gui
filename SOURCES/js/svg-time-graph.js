@@ -47,13 +47,16 @@ class svgTimeGraph {
         if (this.yAxisLogScale) {
 	    y = d3.scaleLog().domain(this.yrange).range([this.height, 0]);
         }
-	var ticktime = +(this.mintime_s / 5); // always show ~5 ticks
+	var ticktime = (this.mintime_s / 5); // always show ~5 ticks
 	var format = "%H:%M";
-	if (this.mintime_s < 300) {
-	    format += ":%S";
-	}
-	var xAxis = d3.axisBottom().scale(x).tickSize(-this.height)
-	    .tickFormat(d3.timeFormat(format)).ticks(d3.timeSecond.every(ticktime));
+        if (this.mintime_s < 300) {
+            format += ":%S";
+            var xAxis = d3.axisBottom().scale(x).tickSize(-this.height)
+                        .tickFormat(d3.timeFormat(format)).ticks(d3.timeSecond.every(ticktime));
+        } else {
+            var xAxis = d3.axisBottom().scale(x).tickSize(-this.height)
+                        .tickFormat(d3.timeFormat(format)).ticks(d3.timeMinute.every(ticktime/60));
+        }
 	var yAxis = d3.axisLeft().scale(y).tickSize(-this.width);
 	if (this.yAxisLogScale) {
 	    yAxis.tickFormat(d3.format("d"));

@@ -25,7 +25,7 @@ if (!port) { port = default_port; }
 var jsonUrl = host + ":" + port;
 var active_tab = default_tab;
 
-var default_graph_time_range = 600;
+var default_graph_time_range = 300;
 
 var graph_pendingEvents = new svgTimeGraph("#maxPendingEvents", 400, 200)
 graph_pendingEvents.addYAxisLabel("Number of Events");
@@ -101,6 +101,8 @@ function updateMintime(time) {
     graph_hltDataRate.mintime_s = time;
     graph_hltEventRate.mintime_s = time;
     graph_avgEventSize.mintime_s = time;
+    graph_detectorEventRate.mintime_s = time;
+    graph_detectorDataRate.mintime_s = time;
     drawgraphs();
 }
 
@@ -113,8 +115,7 @@ function zoomIn() {
 
 function zoomOut() {
     mintime = graph_pendingEvents.mintime_s;
-    if (mintime >= default_graph_time_range) { mintime = default_graph_time_range; }
-    else { mintime = mintime * 2; }
+    mintime = mintime * 2;
     updateMintime(mintime);
 }
 
