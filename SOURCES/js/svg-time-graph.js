@@ -5,7 +5,7 @@
 class svgTimeGraph {
     constructor(selector, width, height) {
 	this.margins = [50, 20, 20, 80];
-        this.legendspace_x = width/3;
+        this.legendspace_x = width/2;
 	this.legendspace_y = this.margins[0]/4;
 	this.mintime_s = 300; // display min. 10 minutes
 	//this.ticktime_s = mintime_s / 5; // grid tick every 2 minutes
@@ -27,6 +27,7 @@ class svgTimeGraph {
 
 	this.updateAxis();
 	this.lines = [];
+	this.labels = [];
         this.yAxisLogScale = 0;
     }
 
@@ -81,6 +82,7 @@ class svgTimeGraph {
             .attr("x", this.legendspace_x*xindex).style("fill", this.color(index))
 	    .attr("y", -this.margins[0] + this.legendspace_y*yindex).text(label);
 	this.lines.push({index:[]});
+        this.labels[index] = label;
     }
 
     updateLine(index, xseq, yseq) {
@@ -123,6 +125,7 @@ class svgTimeGraph {
             this.graph.select("#label"+index).attr("visibility", "hidden");
         } else {
             this.graph.select("#label"+index).attr("visibility", "unset");
+            this.graph.select("#label"+index).text(this.labels[index] + ": " + yseq[yseq.length-1]);
         }
 
 	this.updateAxis();

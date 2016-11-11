@@ -240,7 +240,7 @@ function drawgraphs(){
 		graph_detectorEventRate.updateLine(3, time, data.seq_itssddInputEventRate);
 		graph_detectorEventRate.updateLine(4, time, data.seq_emcalInputEventRate);
 		graph_detectorEventRate.updateLine(5, time, data.seq_trdInputEventRate);
-		graph_detectorEventRate.updateLine(6, time, data.seq_v0InputEventRate);
+		graph_detectorEventRate.updateLine(6, time, data.seq_vzeroInputEventRate);
 		graph_detectorEventRate.updateLine(7, time, data.seq_zdcInputEventRate);
 
 		graph_detectorDataRate.updateLine(0, time, data.seq_tpcInputDataRate);
@@ -249,7 +249,7 @@ function drawgraphs(){
 		graph_detectorDataRate.updateLine(3, time, data.seq_itssddInputDataRate);
 		graph_detectorDataRate.updateLine(4, time, data.seq_emcalInputDataRate);
 		graph_detectorDataRate.updateLine(5, time, data.seq_trdInputDataRate);
-		graph_detectorDataRate.updateLine(6, time, data.seq_v0InputDataRate);
+		graph_detectorDataRate.updateLine(6, time, data.seq_vzeroInputDataRate);
 		graph_detectorDataRate.updateLine(7, time, data.seq_zdcInputDataRate);
 	    }
 	}
