@@ -70,6 +70,12 @@ graph_detectorDataRate.addLine(6, "V0 Input Data Rate");
 graph_detectorDataRate.addLine(7, "ZDC Input Data Rate");
 graph_detectorDataRate.setYAxisLogScale(1);
 
+var graph_tpcLinkDataRate = new svgTimeGraph("#tpcLinkDataRate", 400, 200);
+graph_tpcLinkDataRate.addYAxisLabel("Data Rate [MB/s]");
+graph_tpcLinkDataRate.addLine(0, "TPC minimum RP Data Process Rate");
+graph_tpcLinkDataRate.addLine(1, "TPC median RP Data Process Rate");
+graph_tpcLinkDataRate.addLine(2, "TPC maximum RP Data Process Rate");
+
 var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
 var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");
 var tbl_maxPendingInputsBridges = d3.select("#maxPendingInputsBridges");
@@ -103,6 +109,7 @@ function updateMintime(time) {
     graph_avgEventSize.mintime_s = time;
     graph_detectorEventRate.mintime_s = time;
     graph_detectorDataRate.mintime_s = time;
+    graph_tpcLinkDataRate.mintime_s = time;
     drawgraphs();
 }
 
@@ -252,6 +259,10 @@ function drawgraphs(){
 		graph_detectorDataRate.updateLine(5, time, data.seq_trdInputDataRate);
 		graph_detectorDataRate.updateLine(6, time, data.seq_vzeroInputDataRate);
 		graph_detectorDataRate.updateLine(7, time, data.seq_zdcInputDataRate);
+
+                graph_tpcLinkDataRate.updateLine(0, time, data.seq_tpc_linkdatarate_min);
+                graph_tpcLinkDataRate.updateLine(1, time, data.seq_tpc_linkdatarate_median);
+                graph_tpcLinkDataRate.updateLine(2, time, data.seq_tpc_linkdatarate_max);
 	    }
 	}
     });
