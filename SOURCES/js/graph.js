@@ -91,6 +91,20 @@ graph_spdLinkDataRate.addLine(1, "SPD median RP Data Process Rate");
 graph_spdLinkDataRate.addLine(2, "SPD maximum RP Data Process Rate");
 var tbl_spdLinkDataRates = d3.select("#tbl_spdLinkDataRate");
 
+var graph_ssdLinkDataRate = new svgTimeGraph("#ssdLinkDataRate", 400, 200);
+graph_ssdLinkDataRate.addYAxisLabel("Data Rate [MB/s]");
+graph_ssdLinkDataRate.addLine(0, "SSD minimum RP Data Process Rate");
+graph_ssdLinkDataRate.addLine(1, "SSD median RP Data Process Rate");
+graph_ssdLinkDataRate.addLine(2, "SSD maximum RP Data Process Rate");
+var tbl_ssdLinkDataRates = d3.select("#tbl_ssdLinkDataRate");
+
+var graph_sddLinkDataRate = new svgTimeGraph("#sddLinkDataRate", 400, 200);
+graph_sddLinkDataRate.addYAxisLabel("Data Rate [MB/s]");
+graph_sddLinkDataRate.addLine(0, "SDD minimum RP Data Process Rate");
+graph_sddLinkDataRate.addLine(1, "SDD median RP Data Process Rate");
+graph_sddLinkDataRate.addLine(2, "SDD maximum RP Data Process Rate");
+var tbl_sddLinkDataRates = d3.select("#tbl_sddLinkDataRate");
+
 var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
 var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");
 var tbl_maxPendingInputsBridges = d3.select("#maxPendingInputsBridges");
@@ -290,6 +304,16 @@ function drawgraphs(){
                 graph_spdLinkDataRate.updateLine(1, time, data.seq_itsspd_linkdatarate_median);
                 graph_spdLinkDataRate.updateLine(2, time, data.seq_itsspd_linkdatarate_max);
 		updateStats(tbl_spdLinkDataRates, getField(data, "list_linkrate_itsspd", []));
+
+                graph_ssdLinkDataRate.updateLine(0, time, data.seq_itsssd_linkdatarate_min);
+                graph_ssdLinkDataRate.updateLine(1, time, data.seq_itsssd_linkdatarate_median);
+                graph_ssdLinkDataRate.updateLine(2, time, data.seq_itsssd_linkdatarate_max);
+		updateStats(tbl_ssdLinkDataRates, getField(data, "list_linkrate_itsssd", []));
+
+                graph_sddLinkDataRate.updateLine(0, time, data.seq_itssdd_linkdatarate_min);
+                graph_sddLinkDataRate.updateLine(1, time, data.seq_itssdd_linkdatarate_median);
+                graph_sddLinkDataRate.updateLine(2, time, data.seq_itssdd_linkdatarate_max);
+		updateStats(tbl_sddLinkDataRates, getField(data, "list_linkrate_itssdd", []));
 	    }
 	}
     });
