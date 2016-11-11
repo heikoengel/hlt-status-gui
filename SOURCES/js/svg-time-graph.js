@@ -102,14 +102,14 @@ class svgTimeGraph {
 	xseq = xseq.slice(tindex, xseq.length);
 	yseq = yseq.slice(tindex, yseq.length);
 	this.lines[index] = yseq;
-	var ymax = 10;
-	this.lines.forEach( function(line) {
-	    var max = d3.max(line);
-	    if (max > ymax) {
-		ymax = max;
-	    }
-	});
-	this.yrange[1] = (this.yAxisLogScale) ? 10*ymax : 1.2*ymax;
+        var ymax = .1;
+        for (var line of this.lines) {
+            var line_max = parseFloat(d3.max(line));
+            if (line_max > ymax) {
+                ymax = line_max;
+            }
+        }
+        this.yrange[1] = (this.yAxisLogScale) ? 10*ymax : 1.2*ymax;
 
 	var x = d3.scaleTime().domain(this.xrange).range([0, this.width]);
 	var y = d3.scaleLinear().domain(this.yrange).range([this.height, 0]);
