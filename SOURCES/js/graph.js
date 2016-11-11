@@ -75,6 +75,21 @@ graph_tpcLinkDataRate.addYAxisLabel("Data Rate [MB/s]");
 graph_tpcLinkDataRate.addLine(0, "TPC minimum RP Data Process Rate");
 graph_tpcLinkDataRate.addLine(1, "TPC median RP Data Process Rate");
 graph_tpcLinkDataRate.addLine(2, "TPC maximum RP Data Process Rate");
+var tbl_tpcLinkDataRates = d3.select("#tpcLinkDataRateTable");
+
+var graph_emcalLinkDataRate = new svgTimeGraph("#emcalLinkDataRate", 400, 200);
+graph_emcalLinkDataRate.addYAxisLabel("Data Rate [MB/s]");
+graph_emcalLinkDataRate.addLine(0, "EMCAL minimum RP Data Process Rate");
+graph_emcalLinkDataRate.addLine(1, "EMCAL median RP Data Process Rate");
+graph_emcalLinkDataRate.addLine(2, "EMCAL maximum RP Data Process Rate");
+var tbl_emcalLinkDataRates = d3.select("#emcalLinkDataRateTable");
+
+var graph_spdLinkDataRate = new svgTimeGraph("#spdLinkDataRate", 400, 200);
+graph_spdLinkDataRate.addYAxisLabel("Data Rate [MB/s]");
+graph_spdLinkDataRate.addLine(0, "SPD minimum RP Data Process Rate");
+graph_spdLinkDataRate.addLine(1, "SPD median RP Data Process Rate");
+graph_spdLinkDataRate.addLine(2, "SPD maximum RP Data Process Rate");
+var tbl_spdLinkDataRates = d3.select("#spdLinkDataRateTable");
 
 var tbl_maxPendingInputsComponents = d3.select("#maxPendingInputsComponents");
 var tbl_maxPendingInputsMergers = d3.select("#maxPendingInputsMergers");
@@ -83,6 +98,7 @@ var tbl_logMessages = addTable("#logMessages", ['Timestamp', 'Facility', 'Messag
 var text_status = d3.select("#status");
 var tbl_procStats = d3.select("#procStats");
 var tbl_frameworkStats = d3.select("#frameworkStats");
+
 
 var hist_bufferUsageSrc = new svgBarGraph("#hist_bufferUsageSrc", 800, 300);
 hist_bufferUsageSrc.addYAxisLabel("Number of Source Components");
@@ -263,6 +279,17 @@ function drawgraphs(){
                 graph_tpcLinkDataRate.updateLine(0, time, data.seq_tpc_linkdatarate_min);
                 graph_tpcLinkDataRate.updateLine(1, time, data.seq_tpc_linkdatarate_median);
                 graph_tpcLinkDataRate.updateLine(2, time, data.seq_tpc_linkdatarate_max);
+		updateStats(tbl_tpcLinkDataRates, getField(data, "list_linkrate_tpc", []);
+
+                graph_emcalLinkDataRate.updateLine(0, time, data.seq_emcal_linkdatarate_min);
+                graph_emcalLinkDataRate.updateLine(1, time, data.seq_emcal_linkdatarate_median);
+                graph_emcalLinkDataRate.updateLine(2, time, data.seq_emcal_linkdatarate_max);
+		updateStats(tbl_emcalLinkDataRates, getField(data, "list_linkrate_emcal", []);
+
+                graph_spdLinkDataRate.updateLine(0, time, data.seq_spd_linkdatarate_min);
+                graph_spdLinkDataRate.updateLine(1, time, data.seq_spd_linkdatarate_median);
+                graph_spdLinkDataRate.updateLine(2, time, data.seq_spd_linkdatarate_max);
+		updateStats(tbl_spdLinkDataRates, getField(data, "list_linkrate_spd", []);
 	    }
 	}
     });
