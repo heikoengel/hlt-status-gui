@@ -199,13 +199,17 @@
       <!-- Detector Stats Tab -->
       <div class="tab_content" id="div_detectorstats" style="display:none;">
 	<div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
 	    <h3>Detector Event Rates</h3>
 	    <div id="detectorEventRate"></div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
 	    <h3>Detector Data Rates</h3>
 	    <div id="detectorDataRate"></div>
+          </div>
+          <div class="col-md-4">
+	    <h3>TPC Link Data Rates</h3>
+	    <div id="tpcLinkDataRate"></div>
           </div>
 	</div>
 
@@ -230,67 +234,81 @@
 
 	<!-- Per Detector Graphs and Tables -->
 	<div class="row">
-          <div class="col-md-4">
-	    <h3>TPC Link Data Rates</h3>
-	    <div id="tpcLinkDataRate"></div>
+
+          <div class="col-md-3">
+	    <h3>EMCAL Link Data Rates</h3>
+	    <div id="emcalLinkDataRate"></div>
+          </div>
+
+          <div class="col-md-3">
+	    <h3>SSD Link Data Rates</h3>
+	    <div id="ssdLinkDataRate"></div>
+          </div>
+
+          <div class="col-md-3">
+	    <h3>SDD Link Data Rates</h3>
+	    <div id="sddLinkDataRate"></div>
+          </div>
+
+          <div class="col-md-3">
+	    <h3>SPD Link Data Rates</h3>
+	    <div id="spdLinkDataRate"></div>
+          </div>
+	</div>
+
+        <div class="row">
+          <div class="col-md-2">
             <table class="table table-condensed table-striped table-bordered">
 	      <thead>
-		<tr><th>CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
+		<tr><th>TPC CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
 	      </thead>
 	      <tbody id="tbl_tpcLinkDataRate">
 	      </tbody>
 	    </table>
           </div>
 
-          <div class="col-md-4">
-	    <h3>EMCAL Link Data Rates</h3>
-	    <div id="emcalLinkDataRate"></div>
+          <div class="col-md-2">
             <table class="table table-condensed table-striped table-bordered">
 	      <thead>
-		<tr><th>CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
+		<tr><th>EMCAL CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
 	      </thead>
 	      <tbody id="tbl_emcalLinkDataRate">
 	      </tbody>
 	    </table>
           </div>
 
-          <div class="col-md-4">
-	    <h3>SSD Link Data Rates</h3>
-	    <div id="ssdLinkDataRate"></div>
+
+          <div class="col-md-2">
             <table class="table table-condensed table-striped table-bordered">
 	      <thead>
-		<tr><th>CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
+		<tr><th>SSD CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
 	      </thead>
 	      <tbody id="tbl_ssdLinkDataRate">
 	      </tbody>
 	    </table>
           </div>
 
-          <div class="col-md-4">
-	    <h3>SDD Link Data Rates</h3>
-	    <div id="sddLinkDataRate"></div>
+          <div class="col-md-2">
             <table class="table table-condensed table-striped table-bordered">
 	      <thead>
-		<tr><th>CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
+		<tr><th>SDD CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
 	      </thead>
 	      <tbody id="tbl_sddLinkDataRate">
 	      </tbody>
 	    </table>
           </div>
 
-          <div class="col-md-4">
-	    <h3>SPD Link Data Rates</h3>
-	    <div id="spdLinkDataRate"></div>
+          <div class="col-md-2">
             <table class="table table-condensed table-striped table-bordered">
 	      <thead>
-		<tr><th>CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
+		<tr><th>SPD CRORCPublisher</th><th>Data Rate [B/s]</th></tr>
 	      </thead>
 	      <tbody id="tbl_spdLinkDataRate">
 	      </tbody>
 	    </table>
           </div>
-	</div>
 
+        </div>
       </div>
 
 
