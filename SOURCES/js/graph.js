@@ -8,7 +8,7 @@
  * 0.1  Aug. 2016       hengel          Initial Version
  *
  **/
-var default_host = "ecs0";
+var default_host = "monitoring0";
 var default_port = "8080";
 var default_tab = "main";
 var maxLogMessages = 25;
