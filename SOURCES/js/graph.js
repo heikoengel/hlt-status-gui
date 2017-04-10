@@ -140,6 +140,10 @@ function updateMintime(time) {
     graph_detectorEventRate.mintime_s = time;
     graph_detectorDataRate.mintime_s = time;
     graph_tpcLinkDataRate.mintime_s = time;
+    graph_spdLinkDataRate.mintime_s = time;
+    graph_sddLinkDataRate.mintime_s = time;
+    graph_ssdLinkDataRate.mintime_s = time;
+    graph_emcalLinkDataRate.mintime_s = time;
     drawgraphs();
 }
 
